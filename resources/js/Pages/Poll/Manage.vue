@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import axios from 'axios'
 import { Head } from '@inertiajs/vue3'
 import QRCode from 'qrcode'
@@ -17,10 +17,26 @@ const poll = ref(props.poll)
 const qrDataUrl = ref('')
 const copyState = ref('idle') // idle | copied
 const savingSettings = ref(false)
-const settingsSavedFlash = ref(false)
 const settingsError = ref('')
 const newOptionLabel = ref('')
 const pollTimer = ref(null)
+const isEditingField = ref(false)
+const questionTextarea = ref(null)
+const descriptionTextarea = ref(null)
+
+function autoGrow(el) {
+  if (!el) return
+  el.style.height = 'auto'
+  el.style.height = `${el.scrollHeight}px`
+}
+
+function autoGrowQuestion(event) {
+  autoGrow(event?.target ?? questionTextarea.value)
+}
+
+function autoGrowDescription(event) {
+  autoGrow(event?.target ?? descriptionTextarea.value)
+}
 const resetModalOpen = ref(false)
 const resettingPoll = ref(false)
 const manageLinkEmail = ref('')
@@ -36,6 +52,9 @@ async function refresh() {
   try {
     const { data } = await axios.get(`/p/${poll.value.manage_token}/edit/data`)
     poll.value = data
+    await nextTick()
+    autoGrowQuestion()
+    autoGrowDescription()
   } catch (e) {
     // Live-Refresh-Fehler bewusst still ignorieren, nächster Tick versucht's erneut
   }
@@ -49,8 +68,9 @@ async function saveSettings(patch) {
   try {
     const { data } = await axios.patch(`/p/${poll.value.manage_token}/edit`, patch)
     poll.value = data
-    settingsSavedFlash.value = true
-    setTimeout(() => (settingsSavedFlash.value = false), 1500)
+    await nextTick()
+    autoGrowQuestion()
+    autoGrowDescription()
   } catch (e) {
     poll.value = previous // Bei Fehler: alten Zustand wiederherstellen
     console.error('Einstellung konnte nicht gespeichert werden:', e.response?.status, e.response?.data)
@@ -103,13 +123,21 @@ function downloadQr() {
 }
 
 onMounted(async () => {
+  await nextTick()
+  autoGrowQuestion()
+  autoGrowDescription()
+
   qrDataUrl.value = await QRCode.toDataURL(publicUrl.value, {
     width: 320,
     margin: 1,
     color: { dark: '#2b2c30', light: '#ffffff' },
   })
 
-  pollTimer.value = setInterval(refresh, 6000)
+  pollTimer.value = setInterval(() => {
+    // Während ein Eingabefeld fokussiert ist, kein Live-Refresh –
+    // sonst überschreibt refresh() ungespeicherte Eingaben mitten im Tippen.
+    if (!isEditingField.value) refresh()
+  }, 6000)
 })
 
 onUnmounted(() => {
@@ -170,11 +198,11 @@ const exportDate = computed(() =>
 </script>
 
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen overflow-x-hidden">
     <Head :title="`${poll.question} – Verwalten – SimpleVoter`" />
 
     <header class="flex items-center justify-between px-6 py-3 max-w-4xl w-full mx-auto">
-      <img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="h-14 w-auto" />
+      <img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="w-44 h-auto" />
       <LanguageSwitcher />
     </header>
 
@@ -185,21 +213,30 @@ const exportDate = computed(() =>
     <main class="max-w-4xl mx-auto px-6 pb-16 grid gap-6 lg:grid-cols-[1.2fr_1fr] min-w-0">
       <!-- Linke Spalte: Beschreibung, Ergebnisse, Fragen -->
       <div class="space-y-6 min-w-0">
-        <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
+        <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6 overflow-hidden">
           <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-3">
             {{ t('manage.descriptionSection') }}
           </h2>
-          <input
+          <textarea
+            ref="questionTextarea"
             :value="poll.question"
+            @input="autoGrowQuestion"
             @change="saveSettings({ question: $event.target.value })"
-            class="w-full min-w-0 font-display font-semibold text-2xl mb-2 px-2 py-1 -mx-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-sv-accent)]"
+            @focus="isEditingField = true"
+            @blur="isEditingField = false"
+            rows="1"
+            class="block w-full max-w-full min-w-0 box-border font-display font-semibold text-2xl mb-2 py-1 rounded-lg resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-[var(--color-sv-accent)]"
           />
           <textarea
+            ref="descriptionTextarea"
             :value="poll.description"
+            @input="autoGrowDescription"
             @change="saveSettings({ description: $event.target.value })"
+            @focus="isEditingField = true"
+            @blur="isEditingField = false"
             :placeholder="t('manage.descriptionLabel')"
             rows="2"
-            class="w-full min-w-0 text-sm text-[var(--color-sv-gray)] px-2 py-1 -mx-2 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-sv-accent)]"
+            class="block w-full max-w-full min-w-0 box-border text-sm text-[var(--color-sv-gray)] py-1 rounded-lg resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-[var(--color-sv-accent)]"
           />
         </section>
 
@@ -220,7 +257,9 @@ const exportDate = computed(() =>
                 <input
                   :value="option.label"
                   @change="updateOptionLabel(option, $event.target.value)"
-                  class="font-medium bg-transparent min-w-0 focus:outline-none focus:ring-2 focus:ring-[var(--color-sv-accent)] rounded px-1 -mx-1"
+                  @focus="isEditingField = true"
+                  @blur="isEditingField = false"
+                  class="font-medium bg-transparent min-w-0 max-w-full box-border focus:outline-none focus:ring-2 focus:ring-[var(--color-sv-accent)] rounded px-1"
                 />
                 <span class="font-mono-num text-[var(--color-sv-gray)]">{{ option.vote_count }} {{ t('manage.votes') }}</span>
               </div>
@@ -382,7 +421,6 @@ const exportDate = computed(() =>
               {{ t('manage.nameRequired') }}
             </label>
           </div>
-          <p v-if="settingsSavedFlash" class="text-xs text-[var(--color-sv-accent)] mt-3">{{ t('manage.saved') }}</p>
         </section>
 
         <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">

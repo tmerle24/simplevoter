@@ -102,7 +102,7 @@ async function submit() {
     <Head title="SimpleVoter – Umfragen in Sekunden erstellt" />
 
     <header class="flex items-center justify-between px-6 py-3 max-w-2xl w-full mx-auto">
-      <img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="h-14 w-auto" />
+      <img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="w-44 h-auto" />
       <LanguageSwitcher />
     </header>
 
