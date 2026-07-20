@@ -35,7 +35,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
     <button
       type="button"
       @click="open = !open"
-      class="flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-lg border border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)] cursor-pointer transition-colors"
+      class="flex items-center gap-1.5 text-sm px-2.5 py-1.5 rounded-lg hover:bg-[var(--color-sv-gray-light)] cursor-pointer transition-colors"
     >
       <span class="text-base leading-none">{{ LANGUAGES[locale]?.flag }}</span>
       <svg

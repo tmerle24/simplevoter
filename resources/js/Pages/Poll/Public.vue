@@ -268,7 +268,7 @@ onUnmounted(() => clearInterval(pollTimer))
             <button
               type="submit"
               :disabled="!questionContent.trim() || submittingQuestion"
-              class="w-full py-2 rounded-lg bg-[var(--color-sv-dark)] text-white text-sm hover:bg-[var(--color-sv-accent)] disabled:opacity-40"
+              class="w-full mt-2 py-2 rounded-lg bg-[var(--color-sv-dark)] text-white text-sm hover:bg-[var(--color-sv-accent)] disabled:opacity-40"
             >
               {{ t('public.send') }}
             </button>
