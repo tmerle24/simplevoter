@@ -17,54 +17,36 @@ const { t } = useI18n()
       <h1 class="font-display font-semibold text-2xl mb-6">{{ t('legal.imprintTitle') }}</h1>
 
       <div class="prose prose-sm text-[var(--color-sv-dark)] space-y-6">
-        <!--
-          TODO: Angaben gemäß § 5 TMG ergänzen. Diese Struktur ist eine
-          Orientierung, keine Rechtsberatung – bitte vor Live-Gang prüfen
-          (lassen).
-        -->
+
         <section>
           <h2 class="font-display font-semibold text-base mb-1">Anbieter</h2>
           <p class="text-sm text-[var(--color-sv-gray)]">
-            [Vollständiger Name / Firmenname]<br />
-            [Straße Hausnummer]<br />
-            [PLZ Ort]<br />
-            [Land]
+            TM Systems Till Merlé<br />
+            Birkenstr. 19<br />
+            61440 Oberursel<br />
+            Germany
           </p>
         </section>
 
         <section>
           <h2 class="font-display font-semibold text-base mb-1">Kontakt</h2>
           <p class="text-sm text-[var(--color-sv-gray)]">
-            E-Mail: [kontakt@simplevoter.com]<br />
-            Telefon: [optional]
+            E-Mail: hello@simplevoter.com<br />
+            Telefon: +491704814147
           </p>
         </section>
 
         <section>
           <h2 class="font-display font-semibold text-base mb-1">Vertretungsberechtigt</h2>
           <p class="text-sm text-[var(--color-sv-gray)]">
-            [Name der vertretungsberechtigten Person, falls juristische Person]
-          </p>
-        </section>
-
-        <section>
-          <h2 class="font-display font-semibold text-base mb-1">Registereintrag</h2>
-          <p class="text-sm text-[var(--color-sv-gray)]">
-            [Falls zutreffend: Registergericht, Registernummer]
-          </p>
-        </section>
-
-        <section>
-          <h2 class="font-display font-semibold text-base mb-1">Umsatzsteuer-ID</h2>
-          <p class="text-sm text-[var(--color-sv-gray)]">
-            [Falls zutreffend: USt-IdNr. gem. § 27a UStG]
+            Till Merlé
           </p>
         </section>
 
         <section>
           <h2 class="font-display font-semibold text-base mb-1">Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
           <p class="text-sm text-[var(--color-sv-gray)]">
-            [Name, Anschrift wie oben]
+            TM Systems Till Merlé, Birkenstr. 19, 61440 Oberursel, Germany
           </p>
         </section>
 

@@ -17,18 +17,13 @@ const { t } = useI18n()
       <h1 class="font-display font-semibold text-2xl mb-6">{{ t('legal.privacyTitle') }}</h1>
 
       <div class="prose prose-sm text-[var(--color-sv-dark)] space-y-6">
-        <!--
-          TODO: Struktur orientiert an Art. 13 DSGVO, ersetzt keine
-          Rechtsberatung. Bitte vor Live-Gang von fachkundiger Stelle
-          prüfen (lassen) und auf den tatsächlichen Betrieb (Hosting,
-          ggf. Tracking/Analytics) anpassen.
-        -->
+
         <section>
           <h2 class="font-display font-semibold text-base mb-1">1. Verantwortlicher</h2>
           <p class="text-sm text-[var(--color-sv-gray)]">
-            [Vollständiger Name / Firmenname]<br />
-            [Straße Hausnummer, PLZ Ort]<br />
-            E-Mail: [kontakt@simplevoter.com]
+            TM Systems Till Merlé<br />
+            Birkenstr. 19, 61440 Oberursel, Germany<br />
+            E-Mail: hello@simplevoter.com
           </p>
         </section>
 
@@ -38,8 +33,7 @@ const { t } = useI18n()
             Beim Erstellen einer Umfrage speichern wir die IP-Adresse der erstellenden Person
             zur Missbrauchsprävention (creator_ip). Der Hosting-Provider erzeugt zusätzlich
             technische Server-Logfiles (aufgerufene Seite, Zeitpunkt, IP-Adresse), die
-            automatisiert entstehen. [Hosting-Provider und dessen Auftragsverarbeitung hier
-            benennen.]
+            automatisiert entstehen. (OVH Cloud, Deutschland)
           </p>
         </section>
 
@@ -54,17 +48,7 @@ const { t } = useI18n()
         </section>
 
         <section>
-          <h2 class="font-display font-semibold text-base mb-1">4. Eingebundene Schriftarten (Google Fonts)</h2>
-          <p class="text-sm text-[var(--color-sv-gray)]">
-            Diese Seite lädt Schriftarten (Space Grotesk, Inter, IBM Plex Mono) zur Laufzeit von
-            Google-Servern nach. Dabei kann die IP-Adresse deines Geräts an Google übertragen
-            werden. [Falls das vermieden werden soll: Schriftarten stattdessen lokal einbinden
-            (self-hosted), dann diesen Abschnitt entfernen.]
-          </p>
-        </section>
-
-        <section>
-          <h2 class="font-display font-semibold text-base mb-1">5. Speicherdauer</h2>
+          <h2 class="font-display font-semibold text-base mb-1">4. Speicherdauer</h2>
           <p class="text-sm text-[var(--color-sv-gray)]">
             Umfragen inkl. Antwortoptionen, Stimmen und Fragen werden automatisch gelöscht,
             wenn 90 Tage lang keine neue Aktivität (Stimme oder Frage) stattgefunden hat.
@@ -72,7 +56,7 @@ const { t } = useI18n()
         </section>
 
         <section>
-          <h2 class="font-display font-semibold text-base mb-1">6. Deine Rechte</h2>
+          <h2 class="font-display font-semibold text-base mb-1">5. Deine Rechte</h2>
           <p class="text-sm text-[var(--color-sv-gray)]">
             Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der
             Verarbeitung, Datenübertragbarkeit sowie Widerspruch gegen die Verarbeitung
