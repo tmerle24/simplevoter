@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+/*
+ * SimpleVoter Design-Tokens
+ * Farben aus Spec Abschnitt 3 (finale Branding-Farbwerte aus dem Logo).
+ * Tailwind v4: Theme wird direkt per @theme in CSS definiert, kein
+ * separates tailwind.config.js mehr nötig.
+ */
+@theme {
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --color-sv-gray: #9ea7ae;
+  --color-sv-gray-light: #eef0f1;   /* Hintergrund/Borders, aus sv-gray aufgehellt */
+  --color-sv-dark: #2b2c30;
+  --color-sv-accent: #bb3245;
+  --color-sv-accent-light: #f7e6e8; /* z.B. Badge-Hintergrund */
+  --color-sv-bg: #f6f5f4;           /* App-Hintergrund, kühler als Standard-Creme */
+  --color-sv-surface: #ffffff;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-sv-bg);
+  color: var(--color-sv-dark);
+  overflow-x: hidden;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tailwind setzt seit v3.4/v4 standardmäßig cursor: default auf <button> statt
+   pointer (matcht den Browser-Default). Global zurück auf pointer, damit alle
+   Buttons wie klickbare Elemente aussehen. */
+button {
+  cursor: pointer;
+}
+
+/* Signature-Element: pulsierender "Live"-Punkt neben den Ergebnissen */
+@keyframes sv-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+.sv-live-dot {
+  animation: sv-pulse 1.8s ease-in-out infinite;
+}
+
+/* Kurzes Aufblitzen, wenn sich eine Stimmenzahl ändert */
+@keyframes sv-flash {
+  0% { color: var(--color-sv-accent); }
+  100% { color: inherit; }
+}
+.sv-flash {
+  animation: sv-flash 0.6s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sv-live-dot, .sv-flash {
+    animation: none;
+  }
+}
+
+/*
+ * Ergebnis-Download (Spec-Erweiterung "Ergebnis herunterladen"): nutzt den
+ * Browser-Druckdialog statt einer zusätzlichen Client-Library. Beim Drucken
+ * wird ausschließlich #results-print-area angezeigt (siehe Manage.vue,
+ * downloadResults() -> window.print()).
+ */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #pdf-report,
+  #pdf-report * {
+    visibility: visible;
+  }
+  #pdf-report {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 2rem 17%;
+  }
+
+  /*
+   * Browser lassen Hintergrundfarben/-bilder beim Drucken standardmäßig weg,
+   * sofern die Person nicht manuell "Hintergrundgrafiken" aktiviert. Das
+   * würde die Balken unsichtbar machen und den Export "billig" aussehen
+   * lassen. Erzwingt originalgetreue Farben unabhängig von der Einstellung.
+   */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+}
