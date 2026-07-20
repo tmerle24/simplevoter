@@ -232,7 +232,7 @@ onUnmounted(() => clearInterval(pollTimer))
       </p>
     </main>
 
-    <Footer />
+    <Footer :powered-by="true" />
 
     <!-- Fragen-Panel (Abschnitt 7) -->
     <Teleport to="body">
