@@ -10,16 +10,11 @@ const { t } = useI18n()
 // damit einfache E-Mail-Harvester und Telefon-Scraper nichts im HTML finden.
 // Die Bestandteile sind im Quellcode nicht als fertige Strings vorhanden.
 const email = ref('')
-const phone = ref('')
 
 onMounted(() => {
     const u = 'hello'
     const d = 'simplevoter' + '.' + 'com'
     email.value = `${u}@${d}`
-
-    const country = '+49'
-    const num = ['170', '481', '4147'].join(' ')
-    phone.value = `${country} ${num}`
 })
 </script>
 
