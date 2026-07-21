@@ -2,8 +2,25 @@
 import { useI18n } from 'vue-i18n'
 import { Head } from '@inertiajs/vue3'
 import Footer from '@/Components/Footer.vue'
+import {onMounted, ref} from "vue";
 
 const { t } = useI18n()
+
+// JS-Schutz: E-Mail und Telefon werden erst client-seitig zusammengesetzt,
+// damit einfache E-Mail-Harvester und Telefon-Scraper nichts im HTML finden.
+// Die Bestandteile sind im Quellcode nicht als fertige Strings vorhanden.
+const email = ref('')
+const phone = ref('')
+
+onMounted(() => {
+    const u = 'hello'
+    const d = 'simplevoter' + '.' + 'com'
+    email.value = `${u}@${d}`
+
+    const country = '+49'
+    const num = ['170', '481', '4147'].join(' ')
+    phone.value = `${country} ${num}`
+})
 </script>
 
 <template>
@@ -23,7 +40,8 @@ const { t } = useI18n()
           <p class="text-sm text-[var(--color-sv-gray)]">
             TM Systems Till Merlé<br />
             Birkenstr. 19, 61440 Oberursel, Germany<br />
-            E-Mail: hello@simplevoter.com
+            E-Mail:
+            <a v-if="email" :href="`mailto:${email}`" class="hover:text-[var(--color-sv-accent)]">{{ email }}</a>
           </p>
         </section>
 

@@ -2,8 +2,25 @@
 import { useI18n } from 'vue-i18n'
 import { Head } from '@inertiajs/vue3'
 import Footer from '@/Components/Footer.vue'
+import { onMounted, ref } from 'vue'
 
 const { t } = useI18n()
+
+// JS-Schutz: E-Mail und Telefon werden erst client-seitig zusammengesetzt,
+// damit einfache E-Mail-Harvester und Telefon-Scraper nichts im HTML finden.
+// Die Bestandteile sind im Quellcode nicht als fertige Strings vorhanden.
+const email = ref('')
+const phone = ref('')
+
+onMounted(() => {
+  const u = 'hello'
+  const d = 'simplevoter' + '.' + 'com'
+  email.value = `${u}@${d}`
+
+  const country = '+49'
+  const num = ['170', '481', '4147'].join(' ')
+  phone.value = `${country} ${num}`
+})
 </script>
 
 <template>
@@ -31,8 +48,13 @@ const { t } = useI18n()
         <section>
           <h2 class="font-display font-semibold text-base mb-1">Kontakt</h2>
           <p class="text-sm text-[var(--color-sv-gray)]">
-            E-Mail: hello@simplevoter.com<br />
-            Telefon: +491704814147
+            E-Mail:
+            <a v-if="email" :href="`mailto:${email}`" class="hover:text-[var(--color-sv-accent)]">{{ email }}</a>
+            <span v-else>–</span>
+            <br />
+            Telefon:
+            <a v-if="phone" :href="`tel:${phone.replace(/\s/g,'')}`" class="hover:text-[var(--color-sv-accent)]">{{ phone }}</a>
+            <span v-else>–</span>
           </p>
         </section>
 
@@ -54,9 +76,9 @@ const { t } = useI18n()
           <h2 class="font-display font-semibold text-base mb-1">Streitschlichtung</h2>
           <p class="text-sm text-[var(--color-sv-gray)]">
             Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:
-            https://ec.europa.eu/consumers/odr/. Wir sind nicht verpflichtet und nicht bereit, an
+            <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener" class="hover:text-[var(--color-sv-accent)]">ec.europa.eu/consumers/odr/</a>.
+            Wir sind nicht verpflichtet und nicht bereit, an
             Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
-            [Anpassen, falls Teilnahmepflicht besteht.]
           </p>
         </section>
       </div>
