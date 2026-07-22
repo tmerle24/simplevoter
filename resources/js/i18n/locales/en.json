@@ -78,7 +78,14 @@
     "reset": "Reset",
     "resetConfirm": "Really delete all votes and comments for this poll permanently? The question and options are kept.",
     "resetDone": "Reset done.",
-    "downloadResults": "Download results"
+    "downloadResults": "Download results",
+    "pollsSection": "Polls",
+    "addPoll": "Add poll",
+    "editEventName": "Edit event name",
+    "eventNamePlaceholder": "Event name...",
+    "activePollBadge": "Active",
+    "createPoll": "Create",
+    "newPollQuestionPlaceholder": "New poll question..."
   },
   "public": {
     "vote": "Vote",

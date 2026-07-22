@@ -78,7 +78,14 @@
     "reset": "Reiniciar",
     "resetConfirm": "¿Seguro que quieres eliminar permanentemente todos los votos y comentarios de esta encuesta? La pregunta y las opciones se conservarán.",
     "resetDone": "Reiniciado.",
-    "downloadResults": "Descargar resultados"
+    "downloadResults": "Descargar resultados",
+    "pollsSection": "Encuestas",
+    "addPoll": "Añadir encuesta",
+    "editEventName": "Editar nombre del evento",
+    "eventNamePlaceholder": "Nombre del evento...",
+    "activePollBadge": "Activa",
+    "createPoll": "Crear",
+    "newPollQuestionPlaceholder": "Pregunta de la nueva encuesta..."
   },
   "public": {
     "vote": "Votar",

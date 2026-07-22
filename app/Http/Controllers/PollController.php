@@ -2,22 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\Poll;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PollController extends Controller
 {
-    /**
-     * Zero-Friction-Erstellung (Spec Abschnitt 2):
-     * Erster Submit auf der Landing-Page erzeugt implizit Poll + PollOptions.
-     * Response liefert manage_token + public_token; das Frontend speichert
-     * manage_token in LocalStorage und leitet zur Manage-Seite weiter.
-     */
     public function store(Request $request)
     {
-        // Honeypot-Feld (Spec Abschnitt 10, Anti-Spam). Menschen sehen/befüllen
-        // dieses Feld nicht, Bots häufig schon.
         if ($request->filled('website')) {
             abort(422, 'Invalid submission.');
         }
@@ -33,8 +26,11 @@ class PollController extends Controller
             'options.*' => ['required', 'string', 'max:200'],
         ]);
 
-        $poll = DB::transaction(function () use ($validated, $request) {
+        [$event, $poll] = DB::transaction(function () use ($validated, $request) {
+            $event = Event::create([]);
+
             $poll = Poll::create([
+                'event_id' => $event->id,
                 'question' => $validated['question'],
                 'description' => $validated['description'] ?? null,
                 'creator_ip' => $request->ip(),
@@ -47,12 +43,14 @@ class PollController extends Controller
                 ]);
             }
 
-            return $poll;
+            $event->update(['active_poll_id' => $poll->id]);
+
+            return [$event, $poll];
         });
 
         return response()->json([
-            'public_token' => $poll->public_token,
-            'manage_token' => $poll->manage_token,
+            'public_token' => $event->public_token,
+            'manage_token' => $event->manage_token,
         ], 201);
     }
 }

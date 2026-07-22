@@ -78,7 +78,14 @@
     "reset": "Resetten",
     "resetConfirm": "Weet je zeker dat je alle stemmen en reacties van deze enquête permanent wilt verwijderen? De vraag en opties blijven behouden.",
     "resetDone": "Gereset.",
-    "downloadResults": "Resultaat downloaden"
+    "downloadResults": "Resultaat downloaden",
+    "pollsSection": "Enquêtes",
+    "addPoll": "Enquête toevoegen",
+    "editEventName": "Evenementnaam bewerken",
+    "eventNamePlaceholder": "Naam van het evenement...",
+    "activePollBadge": "Actief",
+    "createPoll": "Aanmaken",
+    "newPollQuestionPlaceholder": "Vraag van de nieuwe enquête..."
   },
   "public": {
     "vote": "Stemmen",

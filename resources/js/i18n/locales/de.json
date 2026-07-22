@@ -78,7 +78,14 @@
     "reset": "Zurücksetzen",
     "resetConfirm": "Wirklich alle Stimmen und Kommentare dieser Umfrage unwiderruflich löschen? Die Frage und Optionen bleiben erhalten.",
     "resetDone": "Zurückgesetzt.",
-    "downloadResults": "Ergebnis herunterladen"
+    "downloadResults": "Ergebnis herunterladen",
+    "pollsSection": "Umfragen",
+    "addPoll": "Umfrage hinzufügen",
+    "editEventName": "Event-Name bearbeiten",
+    "eventNamePlaceholder": "Event-Name...",
+    "activePollBadge": "Aktiv",
+    "createPoll": "Erstellen",
+    "newPollQuestionPlaceholder": "Frage der neuen Umfrage..."
   },
   "public": {
     "vote": "Abstimmen",

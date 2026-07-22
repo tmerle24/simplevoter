@@ -11,6 +11,7 @@ class Poll extends Model
     use HasFactory;
 
     protected $fillable = [
+        'event_id',
         'question',
         'description',
         'result_visibility',
@@ -54,6 +55,11 @@ class Poll extends Model
         } while (self::where($column, $token)->exists());
 
         return $token;
+    }
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
     }
 
     public function options()

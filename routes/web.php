@@ -9,7 +9,6 @@ use App\Http\Controllers\VoteController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Startseite mit Eingabefeld (Zero-Friction-Erstellung, Spec Abschnitt 2)
 Route::get('/', fn () => Inertia::render('Landing'))->name('home');
 
 Route::get('/datenschutz', fn () => Inertia::render('Legal/Privacy'))->name('legal.privacy');
@@ -19,8 +18,8 @@ Route::post('/polls', [PollController::class, 'store'])
     ->middleware('throttle:20,1')
     ->name('poll.store');
 
-// Owner-Bereich – {poll} wird über manage_token aufgelöst
-Route::prefix('/p/{poll:manage_token}/edit')->name('poll.')->group(function () {
+// Owner-Bereich – {poll} wird über manage_token aufgelöst (Event oder Poll via AppServiceProvider)
+Route::prefix('/p/{poll}/edit')->name('poll.')->group(function () {
     Route::get('/', [PollManageController::class, 'show'])->name('show');
     Route::get('/data', [PollManageController::class, 'data'])->name('data');
     Route::patch('/', [PollManageController::class, 'update'])->name('update');
@@ -33,10 +32,14 @@ Route::prefix('/p/{poll:manage_token}/edit')->name('poll.')->group(function () {
     Route::delete('/options/{option}', [PollOptionController::class, 'destroy'])->name('options.destroy');
     Route::post('/reorder', [PollOptionController::class, 'reorder'])->name('options.reorder');
     Route::get('/questions', [QuestionController::class, 'indexForOwner'])->name('questions.index');
+    // Event-spezifische Routen
+    Route::post('/polls', [PollManageController::class, 'addPoll'])->name('event.addPoll');
+    Route::post('/polls/{pid}/activate', [PollManageController::class, 'activatePoll'])->name('event.activatePoll');
+    Route::patch('/event', [PollManageController::class, 'updateEventName'])->name('event.updateName');
 });
 
-// Public-Bereich – {poll} wird über public_token aufgelöst
-Route::prefix('/w/{poll:public_token}')->name('public.')->group(function () {
+// Public-Bereich – {poll} wird über public_token aufgelöst (Event oder Poll via AppServiceProvider)
+Route::prefix('/w/{poll}')->name('public.')->group(function () {
     Route::get('/', [PublicPollController::class, 'show'])->name('show');
     Route::post('/vote', [VoteController::class, 'store'])
         ->middleware('throttle:30,1')

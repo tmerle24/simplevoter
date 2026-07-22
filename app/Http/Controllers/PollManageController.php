@@ -12,10 +12,6 @@ use Inertia\Inertia;
 
 class PollManageController extends Controller
 {
-    /**
-     * Owner-Ansicht. $poll wird via Route-Model-Binding über manage_token
-     * aufgelöst (Route: /p/{poll:manage_token}/edit).
-     */
     public function show(Poll $poll)
     {
         return Inertia::render('Poll/Manage', [
@@ -23,11 +19,6 @@ class PollManageController extends Controller
         ]);
     }
 
-    /**
-     * Reload nach LocalStorage-Restore (Spec Abschnitt 2, Schritt 4):
-     * Wird per axios abgefragt, wenn die Manage-Seite direkt aufgerufen wird
-     * und der Token schon im LocalStorage liegt, ohne vollen Inertia-Visit.
-     */
     public function data(Poll $poll)
     {
         return response()->json($this->ownerPayload($poll));
@@ -50,10 +41,6 @@ class PollManageController extends Controller
         return response()->json($this->ownerPayload($poll));
     }
 
-    /**
-     * "Zurücksetzen": löscht alle Stimmen und Fragen dieser Umfrage,
-     * Frage und Antwortoptionen selbst bleiben unverändert bestehen.
-     */
     public function reset(Poll $poll)
     {
         DB::transaction(function () use ($poll) {
@@ -65,28 +52,97 @@ class PollManageController extends Controller
         return response()->json($this->ownerPayload($poll));
     }
 
-    /**
-     * "Per E-Mail sichern" (Spec Abschnitt 2 + 8): reine Bequemlichkeit,
-     * keine Registrierung. Schickt den Verwaltungs-Link per Mail zu.
-     */
     public function sendManageLink(Request $request, Poll $poll)
     {
         $validated = $request->validate([
             'email' => ['required', 'email', 'max:255'],
         ]);
 
-        Mail::to($validated['email'])->send(new ManageLinkMail($poll));
+        $event = request()->attributes->get('_event');
+        $manageToken = $event ? $event->manage_token : $poll->manage_token;
+
+        try {
+            Mail::to($validated['email'])->send(new ManageLinkMail($poll, $manageToken));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('ManageLinkMail fehlgeschlagen', ['error' => $e->getMessage()]);
+            return response()->json(['message' => 'E-Mail konnte nicht gesendet werden.'], 500);
+        }
 
         return response()->json(['ok' => true]);
     }
 
+    public function addPoll(Request $request, Poll $poll)
+    {
+        $event = request()->attributes->get('_event');
+        abort_unless($event, 403, 'Not an event context.');
+
+        $validated = $request->validate([
+            'question' => ['required', 'string', 'max:500'],
+            'description' => ['nullable', 'string', 'max:2000'],
+            'options' => ['nullable', 'array', 'max:20'],
+            'options.*' => ['required', 'string', 'max:200'],
+        ]);
+
+        $newPoll = DB::transaction(function () use ($event, $validated, $request) {
+            $newPoll = Poll::create([
+                'event_id' => $event->id,
+                'question' => $validated['question'],
+                'description' => $validated['description'] ?? null,
+                'creator_ip' => $request->ip(),
+            ]);
+
+            foreach (array_values($validated['options'] ?? []) as $index => $label) {
+                $newPoll->options()->create(['label' => $label, 'sort_order' => $index]);
+            }
+
+            $event->update(['active_poll_id' => $newPoll->id]);
+
+            return $newPoll;
+        });
+
+        return response()->json($this->ownerPayload($newPoll));
+    }
+
+    public function activatePoll(Request $request, Poll $poll, int $pid)
+    {
+        $event = request()->attributes->get('_event');
+        abort_unless($event, 403, 'Not an event context.');
+
+        $target = Poll::where('id', $pid)->where('event_id', $event->id)->firstOrFail();
+        $event->update(['active_poll_id' => $target->id]);
+
+        return response()->json($this->ownerPayload($target));
+    }
+
+    public function updateEventName(Request $request, Poll $poll)
+    {
+        $event = request()->attributes->get('_event');
+        abort_unless($event, 403, 'Not an event context.');
+
+        $validated = $request->validate([
+            'name' => ['nullable', 'string', 'max:200'],
+        ]);
+
+        $event->update(['name' => $validated['name'] ?? null]);
+
+        return response()->json($this->ownerPayload($poll));
+    }
+
     private function ownerPayload(Poll $poll): array
     {
-        // Owner bekommt alles inkl. beider Tokens (fürs Teilen-Panel / QR-Code).
+        $event = request()->attributes->get('_event');
+
+        // Reload event to get fresh polls list and active_poll_id after mutations
+        if ($event) {
+            $event->refresh();
+            $event->load('polls');
+        }
+
         return [
             'id' => $poll->id,
-            'public_token' => $poll->public_token,
-            'manage_token' => $poll->manage_token,
+            // In event context: use event tokens for all frontend API calls
+            'public_token' => $event ? $event->public_token : $poll->public_token,
+            'manage_token' => $event ? $event->manage_token : $poll->manage_token,
             'question' => $poll->question,
             'description' => $poll->description,
             'result_visibility' => $poll->result_visibility,
@@ -106,6 +162,15 @@ class PollManageController extends Controller
                 'author_name' => $question->author_name,
                 'created_at' => $question->created_at,
             ]),
+            'event' => $event ? [
+                'id' => $event->id,
+                'name' => $event->name,
+                'polls' => $event->polls->map(fn ($p) => [
+                    'id' => $p->id,
+                    'question' => $p->question,
+                    'is_active' => $p->id === $event->active_poll_id,
+                ]),
+            ] : null,
         ];
     }
 }

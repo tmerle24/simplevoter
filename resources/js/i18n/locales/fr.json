@@ -78,7 +78,14 @@
     "reset": "Réinitialiser",
     "resetConfirm": "Vraiment supprimer définitivement tous les votes et commentaires de ce sondage ? La question et les options sont conservées.",
     "resetDone": "Réinitialisé.",
-    "downloadResults": "Télécharger les résultats"
+    "downloadResults": "Télécharger les résultats",
+    "pollsSection": "Sondages",
+    "addPoll": "Ajouter un sondage",
+    "editEventName": "Modifier le nom de l'événement",
+    "eventNamePlaceholder": "Nom de l'événement...",
+    "activePollBadge": "Actif",
+    "createPoll": "Créer",
+    "newPollQuestionPlaceholder": "Question du nouveau sondage..."
   },
   "public": {
     "vote": "Voter",

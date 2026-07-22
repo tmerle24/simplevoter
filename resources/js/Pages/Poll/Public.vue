@@ -67,6 +67,13 @@ async function refreshState() {
 
   // Vote-Zahlen, die sich seit dem letzten Tick geändert haben, kurz aufblitzen
   // lassen (Signature-Element: "Live"-Charakter der Ergebnisse).
+  // Poll switched (event context: active_poll_id changed) → reset vote state
+  if (data.poll.id !== state.value.poll.id) {
+    selected.value = []
+    state.value = data
+    return
+  }
+
   data.options.forEach((next) => {
     const prev = state.value.options.find((o) => o.id === next.id)
     if (prev && prev.vote_count !== next.vote_count) {
@@ -165,7 +172,7 @@ onUnmounted(() => clearInterval(pollTimer))
 
 <template>
   <div class="min-h-screen flex flex-col">
-    <Head :title="`${poll.question} – SimpleVoter`" />
+    <Head :title="`${state.poll.question} – SimpleVoter`" />
 
     <header class="flex items-center justify-between px-6 py-3 max-w-2xl w-full mx-auto">
       <img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="w-44 h-auto" />
@@ -173,7 +180,7 @@ onUnmounted(() => clearInterval(pollTimer))
         <LanguageSwitcher />
 
         <button
-          v-if="poll.questions_enabled"
+          v-if="state.poll.questions_enabled"
           type="button"
           @click="openQuestionsPanel"
           class="relative w-9 h-9 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
@@ -197,8 +204,9 @@ onUnmounted(() => clearInterval(pollTimer))
     </header>
 
     <main class="max-w-2xl mx-auto px-6 pb-16 flex-1 w-full">
-      <h1 class="font-display font-semibold text-3xl mb-2 leading-tight break-words">{{ poll.question }}</h1>
-      <p v-if="poll.description" class="text-[var(--color-sv-gray)] mb-8 break-words">{{ poll.description }}</p>
+      <p v-if="state.poll.event_name" class="text-sm text-[var(--color-sv-accent)] mb-1 tracking-wide">{{ state.poll.event_name }}</p>
+      <h1 class="font-display font-semibold text-3xl mb-2 leading-tight break-words">{{ state.poll.question }}</h1>
+      <p v-if="state.poll.description" class="text-[var(--color-sv-gray)] mb-8 break-words">{{ state.poll.description }}</p>
 
       <p v-if="!state.poll.is_active && state.options.length" class="text-sm text-[var(--color-sv-accent)] mb-6">
         {{ t('public.pollClosed') }}
@@ -289,10 +297,10 @@ onUnmounted(() => clearInterval(pollTimer))
               class="w-full text-sm px-3 py-2 rounded-lg border border-[var(--color-sv-gray-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-sv-accent)] resize-none"
             />
             <input
-              v-if="poll.question_name_mode !== 'hidden'"
+              v-if="state.poll.question_name_mode !== 'hidden'"
               v-model="questionAuthorName"
-              :placeholder="poll.question_name_mode === 'required' ? t('public.yourNameRequired') : t('public.yourName')"
-              :required="poll.question_name_mode === 'required'"
+              :placeholder="state.poll.question_name_mode === 'required' ? t('public.yourNameRequired') : t('public.yourName')"
+              :required="state.poll.question_name_mode === 'required'"
               maxlength="100"
               class="w-full text-sm px-3 py-2 rounded-lg border border-[var(--color-sv-gray-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-sv-accent)]"
             />

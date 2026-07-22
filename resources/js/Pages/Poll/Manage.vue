@@ -43,6 +43,15 @@ const manageLinkEmail = ref('')
 const sendingManageLinkEmail = ref(false)
 const manageLinkEmailStatus = ref('') // '' | 'sent' | 'error'
 
+// Event / Umfragen-Box
+const addPollModalOpen = ref(false)
+const newPollQuestion = ref('')
+const newPollDescription = ref('')
+const addingPoll = ref(false)
+const editingEventName = ref(false)
+const eventNameInput = ref('')
+const savingEventName = ref(false)
+
 const publicUrl = computed(() => `${window.location.origin}/w/${poll.value.public_token}`)
 const manageUrl = computed(() => `${window.location.origin}/p/${poll.value.manage_token}/edit`)
 
@@ -179,6 +188,45 @@ function downloadResults() {
   window.print()
 }
 
+async function submitAddPoll() {
+  if (!newPollQuestion.value.trim() || addingPoll.value) return
+  addingPoll.value = true
+  try {
+    const { data } = await axios.post(`/p/${poll.value.manage_token}/edit/polls`, {
+      question: newPollQuestion.value.trim(),
+      description: newPollDescription.value.trim() || undefined,
+    })
+    poll.value = data
+    newPollQuestion.value = ''
+    newPollDescription.value = ''
+    addPollModalOpen.value = false
+  } finally {
+    addingPoll.value = false
+  }
+}
+
+async function activatePoll(pid) {
+  try {
+    const { data } = await axios.post(`/p/${poll.value.manage_token}/edit/polls/${pid}/activate`)
+    poll.value = data
+  } catch (e) {
+    console.error('Poll-Wechsel fehlgeschlagen:', e.response?.status)
+  }
+}
+
+async function saveEventName() {
+  savingEventName.value = true
+  try {
+    const { data } = await axios.patch(`/p/${poll.value.manage_token}/edit/event`, {
+      name: eventNameInput.value.trim() || null,
+    })
+    poll.value = data
+    editingEventName.value = false
+  } finally {
+    savingEventName.value = false
+  }
+}
+
 function maxVotes(options) {
   return Math.max(1, ...options.map((o) => o.vote_count || 0))
 }
@@ -217,6 +265,7 @@ const exportDate = computed(() =>
           <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-3">
             {{ t('manage.descriptionSection') }}
           </h2>
+          <p v-if="poll.event?.name" class="text-sm text-[var(--color-sv-accent)] mb-1">{{ poll.event.name }}</p>
           <textarea
             ref="questionTextarea"
             :value="poll.question"
@@ -360,8 +409,12 @@ const exportDate = computed(() =>
             <button
               type="submit"
               :disabled="!manageLinkEmail.trim() || sendingManageLinkEmail"
-              class="shrink-0 text-sm px-4 py-2 rounded-lg bg-[var(--color-sv-dark)] text-white hover:bg-[var(--color-sv-accent)] disabled:opacity-40"
+              class="shrink-0 text-sm px-4 py-2 rounded-lg bg-[var(--color-sv-dark)] text-white hover:bg-[var(--color-sv-accent)] disabled:opacity-40 flex items-center gap-1.5"
             >
+              <svg v-if="sendingManageLinkEmail" class="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+              </svg>
               {{ t('manage.emailSend') }}
             </button>
           </form>
@@ -421,6 +474,56 @@ const exportDate = computed(() =>
               {{ t('manage.nameRequired') }}
             </label>
           </div>
+        </section>
+
+        <!-- Umfragen-Box: nur sichtbar wenn Poll zu einem Event gehört -->
+        <section v-if="poll.event" class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-1">
+            <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)]">
+              {{ t('manage.pollsSection') }}
+            </h2>
+            <button
+              v-if="poll.event.polls.length >= 2"
+              type="button"
+              @click="editingEventName = true; eventNameInput = poll.event.name || ''"
+              class="text-xs text-[var(--color-sv-gray)] hover:text-[var(--color-sv-accent)] transition-colors"
+            >
+              {{ t('manage.editEventName') }}
+            </button>
+          </div>
+          <p
+            v-if="poll.event.name"
+            class="text-sm font-medium text-[var(--color-sv-dark)] mb-3 mt-3"
+          >{{ poll.event.name }}</p>
+          <div v-else class="mb-3" />
+
+          <ul class="space-y-2 mb-4">
+            <li
+              v-for="p in poll.event.polls"
+              :key="p.id"
+              class="flex items-center justify-between gap-2 px-3 py-2 rounded-lg border text-sm transition-colors cursor-pointer"
+              :class="p.is_active
+                ? 'border-[var(--color-sv-accent)] bg-[var(--color-sv-accent-light)] text-[var(--color-sv-dark)]'
+                : 'border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)] text-[var(--color-sv-gray)]'"
+              @click="!p.is_active && activatePoll(p.id)"
+            >
+              <span class="truncate flex-1">{{ p.question }}</span>
+              <span
+                v-if="p.is_active"
+                class="shrink-0 text-xs font-medium text-[var(--color-sv-accent)]"
+              >
+                {{ t('manage.activePollBadge') }}
+              </span>
+            </li>
+          </ul>
+
+          <button
+            type="button"
+            @click="addPollModalOpen = true"
+            class="w-full text-sm py-2 rounded-lg border border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)] hover:text-[var(--color-sv-accent)] transition-colors"
+          >
+            + {{ t('manage.addPoll') }}
+          </button>
         </section>
 
         <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
@@ -539,5 +642,79 @@ const exportDate = computed(() =>
     </Teleport>
 
     <Footer />
+
+    <!-- Modal: Umfrage hinzufügen -->
+    <Teleport to="body">
+      <div
+        v-if="addPollModalOpen"
+        class="fixed inset-0 bg-black/30 flex items-center justify-center z-50 px-6"
+        @click.self="addPollModalOpen = false"
+      >
+        <div class="bg-[var(--color-sv-surface)] w-full max-w-sm rounded-2xl p-6">
+          <h2 class="font-display font-semibold text-lg mb-4">{{ t('manage.addPoll') }}</h2>
+          <form @submit.prevent="submitAddPoll" class="space-y-3">
+            <textarea
+              v-model="newPollQuestion"
+              :placeholder="t('manage.newPollQuestionPlaceholder')"
+              rows="2"
+              maxlength="500"
+              class="w-full text-sm px-3 py-2 rounded-lg border border-[var(--color-sv-gray-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-sv-accent)] resize-none"
+            />
+            <div class="flex gap-2">
+              <button
+                type="button"
+                @click="addPollModalOpen = false"
+                class="flex-1 py-2 rounded-lg border border-[var(--color-sv-gray-light)] text-sm hover:border-[var(--color-sv-gray)]"
+              >
+                {{ t('common.cancel') }}
+              </button>
+              <button
+                type="submit"
+                :disabled="!newPollQuestion.trim() || addingPoll"
+                class="flex-1 py-2 rounded-lg bg-[var(--color-sv-dark)] text-white text-sm hover:bg-[var(--color-sv-accent)] disabled:opacity-40"
+              >
+                {{ t('manage.createPoll') }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Modal: Event-Name bearbeiten -->
+    <Teleport to="body">
+      <div
+        v-if="editingEventName"
+        class="fixed inset-0 bg-black/30 flex items-center justify-center z-50 px-6"
+        @click.self="editingEventName = false"
+      >
+        <div class="bg-[var(--color-sv-surface)] w-full max-w-sm rounded-2xl p-6">
+          <h2 class="font-display font-semibold text-lg mb-4">{{ t('manage.editEventName') }}</h2>
+          <input
+            v-model="eventNameInput"
+            :placeholder="t('manage.eventNamePlaceholder')"
+            maxlength="200"
+            class="w-full text-sm px-3 py-2 rounded-lg border border-[var(--color-sv-gray-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-sv-accent)] mb-4"
+          />
+          <div class="flex gap-2">
+            <button
+              type="button"
+              @click="editingEventName = false"
+              class="flex-1 py-2 rounded-lg border border-[var(--color-sv-gray-light)] text-sm hover:border-[var(--color-sv-gray)]"
+            >
+              {{ t('common.cancel') }}
+            </button>
+            <button
+              type="button"
+              @click="saveEventName"
+              :disabled="savingEventName"
+              class="flex-1 py-2 rounded-lg bg-[var(--color-sv-dark)] text-white text-sm hover:bg-[var(--color-sv-accent)] disabled:opacity-40"
+            >
+              {{ t('manage.save') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>

@@ -13,8 +13,13 @@ class ManageLinkMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public Poll $poll)
-    {
+    public function __construct(
+        public Poll $poll,
+        protected string $manageToken = '',
+    ) {
+        if ($this->manageToken === '') {
+            $this->manageToken = $poll->manage_token;
+        }
     }
 
     public function envelope(): Envelope
@@ -30,7 +35,7 @@ class ManageLinkMail extends Mailable
             markdown: 'emails.manage-link',
             with: [
                 'question' => $this->poll->question,
-                'manageUrl' => url('/p/'.$this->poll->manage_token.'/edit'),
+                'manageUrl' => url('/p/'.$this->manageToken.'/edit'),
             ],
         );
     }
