@@ -22,6 +22,7 @@
     }
   },
   "footer": {
+    "home": "Inicio",
     "privacy": "Privacidad",
     "imprint": "Aviso legal",
     "rights": "Todos los derechos reservados."

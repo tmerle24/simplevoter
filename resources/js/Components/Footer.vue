@@ -27,6 +27,7 @@ const props = defineProps({
         <span>© {{ year }} <a href="/">SimpleVoter</a> — {{ t('footer.rights') }}</span>
       </template>
       <nav class="flex items-center gap-4 text-xs">
+        <a href="/" class="hover:text-[var(--color-sv-accent)]">{{ t('footer.home') }}</a>
         <a href="/datenschutz" class="hover:text-[var(--color-sv-accent)]">{{ t('footer.privacy') }}</a>
         <a href="/impressum" class="hover:text-[var(--color-sv-accent)]">{{ t('footer.imprint') }}</a>
       </nav>
