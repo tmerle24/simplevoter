@@ -27,7 +27,7 @@ onMounted(() => {
   <div class="min-h-screen flex flex-col">
     <Head title="Impressum – SimpleVoter" />
     <header class="px-6 py-5 max-w-2xl w-full mx-auto">
-      <a href="/" class="font-display font-semibold text-lg tracking-tight">SimpleVoter</a>
+      <a href="/" class="font-display font-semibold text-lg tracking-tight"><img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="w-44 h-auto" /></a>
     </header>
 
     <main class="flex-1 max-w-2xl mx-auto px-6 py-10 w-full">
