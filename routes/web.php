@@ -44,6 +44,9 @@ Route::prefix('/w/{poll:public_token}')->name('public.')->group(function () {
     Route::post('/questions', [QuestionController::class, 'store'])
         ->middleware('throttle:10,1')
         ->name('questions.store');
+    Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])
+        ->middleware('throttle:20,1')
+        ->name('questions.destroy');
     Route::get('/state', [PublicPollController::class, 'state'])->name('state');
     Route::get('/questions', [QuestionController::class, 'indexForPublic'])->name('questions.index');
 });

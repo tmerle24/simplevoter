@@ -31,6 +31,19 @@ const questionError = ref('')
 const website = ref('') // Honeypot
 const questionsList = ref([])
 
+const myQuestionsKey = `sv_my_questions_${props.publicToken}`
+
+function getMyQuestionIds() {
+  try { return JSON.parse(localStorage.getItem(myQuestionsKey) || '[]') } catch { return [] }
+}
+function addMyQuestionId(id) {
+  const ids = getMyQuestionIds()
+  if (!ids.includes(id)) localStorage.setItem(myQuestionsKey, JSON.stringify([...ids, id]))
+}
+function removeMyQuestionId(id) {
+  localStorage.setItem(myQuestionsKey, JSON.stringify(getMyQuestionIds().filter(i => i !== id)))
+}
+
 const lastSeenKey = `sv_last_seen_question_${props.publicToken}`
 const hasNewQuestions = computed(() => {
   const lastSeen = Number(localStorage.getItem(lastSeenKey) ?? 0)
@@ -103,18 +116,32 @@ async function openQuestionsPanel() {
   await loadQuestions()
 }
 
+async function deleteQuestion(questionId) {
+  try {
+    await axios.delete(`/w/${props.publicToken}/questions/${questionId}`, {
+      data: { author_token: authorToken },
+    })
+    removeMyQuestionId(questionId)
+    questionsList.value = questionsList.value.filter(q => q.id !== questionId)
+    await refreshState()
+  } catch (e) {
+    console.error('Kommentar konnte nicht gelöscht werden:', e.response?.status)
+  }
+}
+
 async function submitQuestion() {
   if (!questionContent.value.trim() || submittingQuestion.value) return
   submittingQuestion.value = true
   questionError.value = ''
 
   try {
-    await axios.post(`/w/${props.publicToken}/questions`, {
+    const { data } = await axios.post(`/w/${props.publicToken}/questions`, {
       content: questionContent.value.trim(),
       author_name: questionAuthorName.value.trim() || undefined,
       author_token: authorToken,
       website: website.value,
     })
+    addMyQuestionId(data.id)
     questionContent.value = ''
     questionAuthorName.value = ''
     await refreshState()
@@ -292,7 +319,20 @@ onUnmounted(() => clearInterval(pollTimer))
           </p>
           <ul v-else class="space-y-3">
             <li v-for="q in questionsList" :key="q.id" class="border-b border-[var(--color-sv-gray-light)] pb-3 last:border-0">
-              <p class="text-sm break-words">{{ q.content }}</p>
+              <div class="flex items-start justify-between gap-2">
+                <p class="text-sm break-words flex-1">{{ q.content }}</p>
+                <button
+                  v-if="getMyQuestionIds().includes(q.id)"
+                  type="button"
+                  @click="deleteQuestion(q.id)"
+                  class="shrink-0 text-[var(--color-sv-gray)] hover:text-[var(--color-sv-accent)] transition-colors mt-0.5"
+                  :aria-label="t('common.delete')"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                  </svg>
+                </button>
+              </div>
               <p v-if="q.author_name" class="text-xs text-[var(--color-sv-gray)] mt-1">— {{ q.author_name }}</p>
             </li>
           </ul>

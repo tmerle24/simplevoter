@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Poll;
+use App\Models\Question;
 use Illuminate\Http\Request;
 
 class QuestionController extends Controller
@@ -60,6 +61,21 @@ class QuestionController extends Controller
                     'created_at' => $question->created_at,
                 ])
         );
+    }
+
+    public function destroy(Request $request, Poll $poll, Question $question)
+    {
+        abort_unless($question->poll_id === $poll->id, 404);
+
+        $validated = $request->validate([
+            'author_token' => ['required', 'string', 'max:64'],
+        ]);
+
+        abort_unless($question->author_token === $validated['author_token'], 403);
+
+        $question->delete();
+
+        return response()->json(['deleted' => true]);
     }
 
     /**
