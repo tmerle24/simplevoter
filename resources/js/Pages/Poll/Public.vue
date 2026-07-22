@@ -152,9 +152,15 @@ onUnmounted(() => clearInterval(pollTimer))
           class="relative w-9 h-9 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
           :aria-label="t('public.askQuestion')"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 110" width="38" height="27">
-            <path d="M 30 10 L 90 10 C 104 10 112 18 112 32 L 112 60 C 112 74 104 82 90 82 L 72 82 L 35 102 L 45 82 L 30 82 C 16 82 8 74 8 60 L 8 32 C 8 18 16 10 30 10 Z" fill="none" stroke="var(--color-sv-dark)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 110" width="38" height="27">
+                <!-- Sprechblasen-Rahmen -->
+                <path d="M 30 10 L 90 10 C 104 10 112 18 112 32 L 112 60 C 112 74 104 82 90 82 L 72 82 L 35 102 L 45 82 L 30 82 C 16 82 8 74 8 60 L 8 32 C 8 18 16 10 30 10 Z" fill="none" stroke="var(--color-sv-gray)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+
+                <!-- Drei Punkte (Ellipse) im Zentrum der Blase -->
+                <circle cx="40" cy="46" r="6" fill="var(--color-sv-gray)" />
+                <circle cx="60" cy="46" r="6" fill="var(--color-sv-gray)" />
+                <circle cx="80" cy="46" r="6" fill="var(--color-sv-gray)" />
+            </svg>
           <span
             v-if="hasNewQuestions"
             class="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-[var(--color-sv-accent)] ring-2 ring-[var(--color-sv-bg)]"
