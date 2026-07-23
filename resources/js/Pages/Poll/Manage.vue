@@ -64,6 +64,7 @@ async function refresh() {
     await nextTick()
     autoGrowQuestion()
     autoGrowDescription()
+    autoGrowAllOptions()
   } catch (e) {
     // Live-Refresh-Fehler bewusst still ignorieren, nächster Tick versucht's erneut
   }
@@ -80,6 +81,7 @@ async function saveSettings(patch) {
     await nextTick()
     autoGrowQuestion()
     autoGrowDescription()
+    autoGrowAllOptions()
   } catch (e) {
     poll.value = previous // Bei Fehler: alten Zustand wiederherstellen
     console.error('Einstellung konnte nicht gespeichert werden:', e.response?.status, e.response?.data)
@@ -131,10 +133,15 @@ function downloadQr() {
   link.click()
 }
 
+function autoGrowAllOptions() {
+  document.querySelectorAll('.option-label-textarea').forEach(autoGrow)
+}
+
 onMounted(async () => {
   await nextTick()
   autoGrowQuestion()
   autoGrowDescription()
+  autoGrowAllOptions()
 
   qrDataUrl.value = await QRCode.toDataURL(publicUrl.value, {
     width: 320,
@@ -302,15 +309,17 @@ const exportDate = computed(() =>
 
           <div class="space-y-3">
             <div v-for="(option, i) in poll.options" :key="option.id" class="group">
-              <div class="flex items-center justify-between text-sm mb-1 min-w-0">
-                <input
+              <div class="flex items-start justify-between text-sm mb-1 min-w-0 gap-2">
+                <textarea
                   :value="option.label"
+                  @input="autoGrow($event.target)"
                   @change="updateOptionLabel(option, $event.target.value)"
                   @focus="isEditingField = true"
                   @blur="isEditingField = false"
-                  class="font-medium bg-transparent min-w-0 max-w-full box-border focus:outline-none focus:ring-2 focus:ring-[var(--color-sv-accent)] rounded px-1"
+                  rows="1"
+                  class="option-label-textarea font-medium bg-transparent flex-1 min-w-0 box-border resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-[var(--color-sv-accent)] rounded px-1"
                 />
-                <span class="font-mono-num text-[var(--color-sv-gray)]">{{ option.vote_count }} {{ t('manage.votes') }}</span>
+                <span class="font-mono-num text-[var(--color-sv-gray)] shrink-0">{{ option.vote_count }} {{ t('manage.votes') }}</span>
               </div>
               <div class="h-2 rounded-full bg-[var(--color-sv-gray-light)] overflow-hidden">
                 <div
