@@ -34,6 +34,7 @@ Route::prefix('/p/{poll}/edit')->name('poll.')->group(function () {
     Route::get('/questions', [QuestionController::class, 'indexForOwner'])->name('questions.index');
     // Event-spezifische Routen
     Route::post('/polls', [PollManageController::class, 'addPoll'])->name('event.addPoll');
+    Route::post('/polls/reorder', [PollManageController::class, 'reorderPolls'])->name('event.reorderPolls');
     Route::post('/polls/{pid}/activate', [PollManageController::class, 'activatePoll'])->name('event.activatePoll');
     Route::post('/polls/{pid}/detach', [PollManageController::class, 'detachPoll'])->name('event.detachPoll');
     Route::delete('/polls/{pid}', [PollManageController::class, 'destroyPoll'])->name('event.destroyPoll');

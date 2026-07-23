@@ -12,6 +12,7 @@ class Poll extends Model
 
     protected $fillable = [
         'event_id',
+        'sort_order',
         'question',
         'description',
         'result_visibility',

@@ -28,7 +28,7 @@ class Event extends Model
 
     public function polls()
     {
-        return $this->hasMany(Poll::class)->orderBy('created_at');
+        return $this->hasMany(Poll::class)->orderBy('sort_order')->orderBy('created_at');
     }
 
     public function activePoll()

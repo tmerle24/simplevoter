@@ -114,6 +114,28 @@ class PollManageController extends Controller
         return response()->json($this->ownerPayload($target));
     }
 
+    public function reorderPolls(Request $request, Poll $poll)
+    {
+        $event = request()->attributes->get('_event');
+        abort_unless($event, 403, 'Not an event context.');
+
+        $validated = $request->validate([
+            'order' => ['required', 'array'],
+            'order.*' => ['integer', 'exists:polls,id'],
+        ]);
+
+        $eventPollIds = $event->polls()->pluck('id')->all();
+        foreach ($validated['order'] as $id) {
+            abort_unless(in_array($id, $eventPollIds, true), 403);
+        }
+
+        foreach ($validated['order'] as $index => $id) {
+            Poll::where('id', $id)->update(['sort_order' => $index]);
+        }
+
+        return response()->json($this->ownerPayload($poll));
+    }
+
     public function detachPoll(Request $request, Poll $poll, int $pid)
     {
         $event = request()->attributes->get('_event');

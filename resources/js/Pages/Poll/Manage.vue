@@ -44,6 +44,36 @@ const sendingManageLinkEmail = ref(false)
 const manageLinkEmailStatus = ref('') // '' | 'sent' | 'error'
 
 // Event / Umfragen-Box
+const dragSourceId = ref(null)
+const dragOverId = ref(null)
+
+function onDragStart(pid) {
+  dragSourceId.value = pid
+}
+
+function onDragOver(e, pid) {
+  e.preventDefault()
+  dragOverId.value = pid
+}
+
+function onDrop(pid) {
+  if (dragSourceId.value === null || dragSourceId.value === pid) return
+  const polls = [...poll.value.event.polls]
+  const fromIdx = polls.findIndex((p) => p.id === dragSourceId.value)
+  const toIdx = polls.findIndex((p) => p.id === pid)
+  const [moved] = polls.splice(fromIdx, 1)
+  polls.splice(toIdx, 0, moved)
+  poll.value = { ...poll.value, event: { ...poll.value.event, polls } }
+  axios
+    .post(`/p/${poll.value.manage_token}/edit/polls/reorder`, { order: polls.map((p) => p.id) })
+    .catch(() => refresh())
+}
+
+function onDragEnd() {
+  dragSourceId.value = null
+  dragOverId.value = null
+}
+
 const addPollModalOpen = ref(false)
 const newPollQuestion = ref('')
 const newPollDescription = ref('')
@@ -533,17 +563,29 @@ const exportDate = computed(() =>
             <li
               v-for="p in poll.event.polls"
               :key="p.id"
+              draggable="true"
+              @dragstart="onDragStart(p.id)"
+              @dragover="onDragOver($event, p.id)"
+              @drop="onDrop(p.id)"
+              @dragend="onDragEnd"
               class="group rounded-lg border text-sm transition-colors"
-              :class="p.is_active
-                ? 'border-[var(--color-sv-accent)] bg-[var(--color-sv-accent-light)]'
-                : 'border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)]'"
+              :class="[
+                p.is_active
+                  ? 'border-[var(--color-sv-accent)] bg-[var(--color-sv-accent-light)]'
+                  : 'border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)]',
+                dragOverId === p.id && dragSourceId !== p.id ? 'ring-2 ring-[var(--color-sv-accent)]' : '',
+                dragSourceId === p.id ? 'opacity-50' : '',
+              ]"
             >
               <div
-                class="flex items-start justify-between gap-2 px-3 py-2 cursor-pointer"
+                class="flex items-start gap-2 px-3 py-2"
                 :class="p.is_active ? 'text-[var(--color-sv-dark)]' : 'text-[var(--color-sv-gray)]'"
-                @click="!p.is_active && activatePoll(p.id)"
               >
-                <span class="break-words flex-1 min-w-0">{{ p.question }}</span>
+                <span class="mt-0.5 cursor-grab text-[var(--color-sv-gray-light)] hover:text-[var(--color-sv-gray)] select-none shrink-0">⠿</span>
+                <span
+                  class="break-words flex-1 min-w-0 cursor-pointer"
+                  @click="!p.is_active && activatePoll(p.id)"
+                >{{ p.question }}</span>
                 <span
                   v-if="p.is_active"
                   class="shrink-0 text-xs font-medium text-[var(--color-sv-accent)]"
