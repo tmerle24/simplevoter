@@ -501,13 +501,13 @@ const exportDate = computed(() =>
             <li
               v-for="p in poll.event.polls"
               :key="p.id"
-              class="flex items-center justify-between gap-2 px-3 py-2 rounded-lg border text-sm transition-colors cursor-pointer"
+              class="flex items-start justify-between gap-2 px-3 py-2 rounded-lg border text-sm transition-colors cursor-pointer"
               :class="p.is_active
                 ? 'border-[var(--color-sv-accent)] bg-[var(--color-sv-accent-light)] text-[var(--color-sv-dark)]'
                 : 'border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)] text-[var(--color-sv-gray)]'"
               @click="!p.is_active && activatePoll(p.id)"
             >
-              <span class="truncate flex-1">{{ p.question }}</span>
+              <span class="break-words flex-1 min-w-0">{{ p.question }}</span>
               <span
                 v-if="p.is_active"
                 class="shrink-0 text-xs font-medium text-[var(--color-sv-accent)]"
