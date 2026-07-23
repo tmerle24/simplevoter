@@ -51,6 +51,8 @@ const addingPoll = ref(false)
 const editingEventName = ref(false)
 const eventNameInput = ref('')
 const savingEventName = ref(false)
+const pollActionTarget = ref(null) // { pid, action: 'detach' | 'delete' }
+const pollActionPending = ref(false)
 
 const publicUrl = computed(() => `${window.location.origin}/w/${poll.value.public_token}`)
 const manageUrl = computed(() => `${window.location.origin}/p/${poll.value.manage_token}/edit`)
@@ -218,6 +220,23 @@ async function activatePoll(pid) {
     poll.value = data
   } catch (e) {
     console.error('Poll-Wechsel fehlgeschlagen:', e.response?.status)
+  }
+}
+
+async function confirmPollAction() {
+  if (!pollActionTarget.value || pollActionPending.value) return
+  pollActionPending.value = true
+  const { pid, action } = pollActionTarget.value
+  try {
+    const { data } = action === 'delete'
+      ? await axios.delete(`/p/${poll.value.manage_token}/edit/polls/${pid}`)
+      : await axios.post(`/p/${poll.value.manage_token}/edit/polls/${pid}/detach`)
+    poll.value = data
+    pollActionTarget.value = null
+  } catch (e) {
+    console.error('Poll-Aktion fehlgeschlagen:', e.response?.status)
+  } finally {
+    pollActionPending.value = false
   }
 }
 
@@ -510,19 +529,43 @@ const exportDate = computed(() =>
             <li
               v-for="p in poll.event.polls"
               :key="p.id"
-              class="flex items-start justify-between gap-2 px-3 py-2 rounded-lg border text-sm transition-colors cursor-pointer"
+              class="group rounded-lg border text-sm transition-colors"
               :class="p.is_active
-                ? 'border-[var(--color-sv-accent)] bg-[var(--color-sv-accent-light)] text-[var(--color-sv-dark)]'
-                : 'border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)] text-[var(--color-sv-gray)]'"
-              @click="!p.is_active && activatePoll(p.id)"
+                ? 'border-[var(--color-sv-accent)] bg-[var(--color-sv-accent-light)]'
+                : 'border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)]'"
             >
-              <span class="break-words flex-1 min-w-0">{{ p.question }}</span>
-              <span
-                v-if="p.is_active"
-                class="shrink-0 text-xs font-medium text-[var(--color-sv-accent)]"
+              <div
+                class="flex items-start justify-between gap-2 px-3 py-2 cursor-pointer"
+                :class="p.is_active ? 'text-[var(--color-sv-dark)]' : 'text-[var(--color-sv-gray)]'"
+                @click="!p.is_active && activatePoll(p.id)"
               >
-                {{ t('manage.activePollBadge') }}
-              </span>
+                <span class="break-words flex-1 min-w-0">{{ p.question }}</span>
+                <span
+                  v-if="p.is_active"
+                  class="shrink-0 text-xs font-medium text-[var(--color-sv-accent)]"
+                >
+                  {{ t('manage.activePollBadge') }}
+                </span>
+              </div>
+              <div
+                v-if="poll.event.polls.length > 1"
+                class="flex gap-3 px-3 pb-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <button
+                  type="button"
+                  @click.stop="pollActionTarget = { pid: p.id, action: 'detach' }"
+                  class="text-xs text-[var(--color-sv-gray)] hover:text-[var(--color-sv-accent)]"
+                >
+                  {{ t('manage.detachPoll') }}
+                </button>
+                <button
+                  type="button"
+                  @click.stop="pollActionTarget = { pid: p.id, action: 'delete' }"
+                  class="text-xs text-[var(--color-sv-gray)] hover:text-[var(--color-sv-accent)]"
+                >
+                  {{ t('manage.deletePoll') }}
+                </button>
+              </div>
             </li>
           </ul>
 
@@ -686,6 +729,41 @@ const exportDate = computed(() =>
               </button>
             </div>
           </form>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Modal: Poll aus Event entfernen / löschen -->
+    <Teleport to="body">
+      <div
+        v-if="pollActionTarget"
+        class="fixed inset-0 bg-black/30 flex items-center justify-center z-50 px-6"
+        @click.self="pollActionTarget = null"
+      >
+        <div class="bg-[var(--color-sv-surface)] w-full max-w-sm rounded-2xl p-6">
+          <h2 class="font-display font-semibold text-lg mb-2">
+            {{ pollActionTarget?.action === 'delete' ? t('manage.deletePoll') : t('manage.detachPoll') }}
+          </h2>
+          <p class="text-sm text-[var(--color-sv-gray)] mb-6">
+            {{ pollActionTarget?.action === 'delete' ? t('manage.deletePollConfirm') : t('manage.detachPollConfirm') }}
+          </p>
+          <div class="flex gap-2">
+            <button
+              type="button"
+              @click="pollActionTarget = null"
+              class="flex-1 py-2 rounded-lg border border-[var(--color-sv-gray-light)] text-sm hover:border-[var(--color-sv-gray)]"
+            >
+              {{ t('common.cancel') }}
+            </button>
+            <button
+              type="button"
+              @click="confirmPollAction"
+              :disabled="pollActionPending"
+              class="flex-1 py-2 rounded-lg bg-[var(--color-sv-accent)] text-white text-sm hover:opacity-90 disabled:opacity-50"
+            >
+              {{ pollActionTarget?.action === 'delete' ? t('common.delete') : t('manage.detachPoll') }}
+            </button>
+          </div>
         </div>
       </div>
     </Teleport>

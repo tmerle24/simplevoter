@@ -86,7 +86,11 @@
     "eventNamePlaceholder": "Naam van het evenement...",
     "activePollBadge": "Actief",
     "createPoll": "Aanmaken",
-    "newPollQuestionPlaceholder": "Vraag van de nieuwe enquête..."
+    "newPollQuestionPlaceholder": "Vraag van de nieuwe enquête...",
+    "detachPoll": "Verwijder uit evenement",
+    "deletePoll": "Enquête verwijderen",
+    "deletePollConfirm": "Deze enquête en alle stemmen en opmerkingen definitief verwijderen?",
+    "detachPollConfirm": "Deze enquête uit het evenement verwijderen? Ze blijft bestaan maar maakt geen deel meer uit van het evenement."
   },
   "public": {
     "vote": "Stemmen",

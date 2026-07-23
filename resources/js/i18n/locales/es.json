@@ -86,7 +86,11 @@
     "eventNamePlaceholder": "Nombre del evento...",
     "activePollBadge": "Activa",
     "createPoll": "Crear",
-    "newPollQuestionPlaceholder": "Pregunta de la nueva encuesta..."
+    "newPollQuestionPlaceholder": "Pregunta de la nueva encuesta...",
+    "detachPoll": "Quitar del evento",
+    "deletePoll": "Eliminar encuesta",
+    "deletePollConfirm": "¿Eliminar permanentemente esta encuesta y todos sus votos y comentarios?",
+    "detachPollConfirm": "¿Quitar esta encuesta del evento? Seguirá existiendo pero ya no formará parte del evento."
   },
   "public": {
     "vote": "Votar",

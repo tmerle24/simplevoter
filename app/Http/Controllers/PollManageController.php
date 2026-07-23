@@ -114,6 +114,46 @@ class PollManageController extends Controller
         return response()->json($this->ownerPayload($target));
     }
 
+    public function detachPoll(Request $request, Poll $poll, int $pid)
+    {
+        $event = request()->attributes->get('_event');
+        abort_unless($event, 403, 'Not an event context.');
+
+        $target = Poll::where('id', $pid)->where('event_id', $event->id)->firstOrFail();
+        abort_if($event->polls()->count() <= 1, 422, 'Cannot detach the only poll from an event.');
+
+        if ($event->active_poll_id === $target->id) {
+            $next = $event->polls()->where('id', '!=', $target->id)->first();
+            $event->update(['active_poll_id' => $next->id]);
+        }
+
+        $target->update(['event_id' => null]);
+        $event->refresh();
+
+        $activePoll = Poll::find($event->active_poll_id);
+        return response()->json($this->ownerPayload($activePoll));
+    }
+
+    public function destroyPoll(Request $request, Poll $poll, int $pid)
+    {
+        $event = request()->attributes->get('_event');
+        abort_unless($event, 403, 'Not an event context.');
+
+        $target = Poll::where('id', $pid)->where('event_id', $event->id)->firstOrFail();
+        abort_if($event->polls()->count() <= 1, 422, 'Cannot delete the only poll in an event.');
+
+        if ($event->active_poll_id === $target->id) {
+            $next = $event->polls()->where('id', '!=', $target->id)->first();
+            $event->update(['active_poll_id' => $next->id]);
+        }
+
+        $target->delete();
+        $event->refresh();
+
+        $activePoll = Poll::find($event->active_poll_id);
+        return response()->json($this->ownerPayload($activePoll));
+    }
+
     public function updateEventName(Request $request, Poll $poll)
     {
         $event = request()->attributes->get('_event');

@@ -86,7 +86,11 @@
     "eventNamePlaceholder": "Nom de l'événement...",
     "activePollBadge": "Actif",
     "createPoll": "Créer",
-    "newPollQuestionPlaceholder": "Question du nouveau sondage..."
+    "newPollQuestionPlaceholder": "Question du nouveau sondage...",
+    "detachPoll": "Retirer de l'événement",
+    "deletePoll": "Supprimer le sondage",
+    "deletePollConfirm": "Supprimer définitivement ce sondage ainsi que tous ses votes et commentaires ?",
+    "detachPollConfirm": "Retirer ce sondage de l'événement ? Il sera conservé mais ne fera plus partie de l'événement."
   },
   "public": {
     "vote": "Voter",

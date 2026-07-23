@@ -86,7 +86,11 @@
     "eventNamePlaceholder": "Event name...",
     "activePollBadge": "Active",
     "createPoll": "Create",
-    "newPollQuestionPlaceholder": "New poll question..."
+    "newPollQuestionPlaceholder": "New poll question...",
+    "detachPoll": "Remove from event",
+    "deletePoll": "Delete poll",
+    "deletePollConfirm": "Permanently delete this poll and all its votes and comments?",
+    "detachPollConfirm": "Remove this poll from the event? It will still exist but will no longer be part of the event."
   },
   "public": {
     "vote": "Vote",

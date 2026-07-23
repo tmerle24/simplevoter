@@ -86,7 +86,11 @@
     "eventNamePlaceholder": "Event-Name...",
     "activePollBadge": "Aktiv",
     "createPoll": "Erstellen",
-    "newPollQuestionPlaceholder": "Frage der neuen Umfrage..."
+    "newPollQuestionPlaceholder": "Frage der neuen Umfrage...",
+    "detachPoll": "Aus Event entfernen",
+    "deletePoll": "Umfrage löschen",
+    "deletePollConfirm": "Diese Umfrage und alle ihre Stimmen und Kommentare unwiderruflich löschen?",
+    "detachPollConfirm": "Diese Umfrage aus dem Event entfernen? Sie bleibt erhalten, ist aber nicht mehr Teil des Events."
   },
   "public": {
     "vote": "Abstimmen",
