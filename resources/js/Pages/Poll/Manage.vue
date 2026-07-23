@@ -248,6 +248,10 @@ async function activatePoll(pid) {
   try {
     const { data } = await axios.post(`/p/${poll.value.manage_token}/edit/polls/${pid}/activate`)
     poll.value = data
+    await nextTick()
+    autoGrowQuestion()
+    autoGrowDescription()
+    autoGrowAllOptions()
   } catch (e) {
     console.error('Poll-Wechsel fehlgeschlagen:', e.response?.status)
   }
