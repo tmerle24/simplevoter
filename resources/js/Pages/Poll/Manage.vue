@@ -231,6 +231,10 @@ async function confirmPollAction() {
     const { data } = action === 'delete'
       ? await axios.delete(`/p/${poll.value.manage_token}/edit/polls/${pid}`)
       : await axios.post(`/p/${poll.value.manage_token}/edit/polls/${pid}/detach`)
+    if (data.redirect) {
+      window.location.href = data.redirect
+      return
+    }
     poll.value = data
     pollActionTarget.value = null
   } catch (e) {
@@ -549,15 +553,8 @@ const exportDate = computed(() =>
               </div>
               <div
                 v-if="poll.event.polls.length > 1"
-                class="flex gap-3 px-3 pb-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                class="flex px-3 pb-2 opacity-0 group-hover:opacity-100 transition-opacity"
               >
-                <button
-                  type="button"
-                  @click.stop="pollActionTarget = { pid: p.id, action: 'detach' }"
-                  class="text-xs text-[var(--color-sv-gray)] hover:text-[var(--color-sv-accent)]"
-                >
-                  {{ t('manage.detachPoll') }}
-                </button>
                 <button
                   type="button"
                   @click.stop="pollActionTarget = { pid: p.id, action: 'delete' }"
@@ -609,8 +606,18 @@ const exportDate = computed(() =>
             type="button"
             @click="resetModalOpen = true"
             class="w-full text-sm py-2 rounded-lg border border-[var(--color-sv-gray-light)] text-[var(--color-sv-accent)] hover:bg-[var(--color-sv-accent-light)]"
+            :class="poll.event?.polls.length === 1 ? 'mb-2' : ''"
           >
             {{ t('manage.reset') }}
+          </button>
+
+          <button
+            v-if="poll.event?.polls.length === 1"
+            type="button"
+            @click="pollActionTarget = { pid: poll.id, action: 'delete' }"
+            class="w-full text-sm py-2 rounded-lg border border-[var(--color-sv-gray-light)] text-[var(--color-sv-accent)] hover:bg-[var(--color-sv-accent-light)]"
+          >
+            {{ t('manage.deletePoll') }}
           </button>
         </section>
       </div>

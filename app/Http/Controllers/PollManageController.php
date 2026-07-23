@@ -140,7 +140,12 @@ class PollManageController extends Controller
         abort_unless($event, 403, 'Not an event context.');
 
         $target = Poll::where('id', $pid)->where('event_id', $event->id)->firstOrFail();
-        abort_if($event->polls()->count() <= 1, 422, 'Cannot delete the only poll in an event.');
+
+        if ($event->polls()->count() <= 1) {
+            $target->delete();
+            $event->delete();
+            return response()->json(['redirect' => '/']);
+        }
 
         if ($event->active_poll_id === $target->id) {
             $next = $event->polls()->where('id', '!=', $target->id)->first();
