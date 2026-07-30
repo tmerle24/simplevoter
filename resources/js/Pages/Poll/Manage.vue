@@ -311,7 +311,9 @@ const exportDate = computed(() =>
 
 <template>
   <div class="min-h-screen overflow-x-hidden">
-    <Head :title="`${poll.question} – Verwalten – SimpleVoter`" />
+    <Head :title="`${poll.question} – Verwalten – SimpleVoter`">
+      <meta name="robots" content="noindex, nofollow" />
+    </Head>
 
     <header class="flex items-center justify-between px-6 py-3 max-w-4xl w-full mx-auto">
       <img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="w-44 h-auto" />

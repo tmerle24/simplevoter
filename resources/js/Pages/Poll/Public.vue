@@ -172,7 +172,9 @@ onUnmounted(() => clearInterval(pollTimer))
 
 <template>
   <div class="min-h-screen flex flex-col">
-    <Head :title="`${state.poll.question} – SimpleVoter`" />
+    <Head :title="`${state.poll.question} – SimpleVoter`">
+      <meta name="robots" content="noindex, nofollow" />
+    </Head>
 
     <header class="flex items-center justify-between px-6 py-3 max-w-2xl w-full mx-auto">
       <img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="w-44 h-auto" />
