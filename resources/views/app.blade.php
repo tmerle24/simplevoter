@@ -12,6 +12,8 @@
         <meta name="theme-color" content="#2b2c30" />
 
         <title inertia>SimpleVoter</title>
+        <meta name="description" content="Kostenlos, ohne Anmeldung. Frage stellen, Link teilen, live abstimmen." />
+        <link rel="canonical" href="{{ url()->current() }}" />
 
         {{-- Open Graph (WhatsApp, Facebook, LinkedIn, ...) --}}
         <meta property="og:type" content="website" />
@@ -28,6 +30,16 @@
         <meta name="twitter:title" content="SimpleVoter – Umfragen in Sekunden erstellt" />
         <meta name="twitter:description" content="Kostenlos, ohne Anmeldung. Frage stellen, Link teilen, live abstimmen." />
         <meta name="twitter:image" content="{{ url('/images/og-image.png') }}" />
+
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "SimpleVoter",
+                "url": "https://simplevoter.com",
+                "description": "Kostenlos, ohne Anmeldung. Frage stellen, Link teilen, live abstimmen."
+            }
+        </script>
 
         @routes
         @vite(['resources/js/app.js'])
