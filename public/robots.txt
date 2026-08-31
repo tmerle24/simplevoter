@@ -2,4 +2,4 @@ User-agent: *
 Disallow: /p/
 Disallow: /w/
 
-Sitemap: https://simplevoter.com/sitemap.xml
+Sitemap: https://www.simplevoter.com/sitemap.xml

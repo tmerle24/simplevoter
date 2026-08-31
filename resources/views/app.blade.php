@@ -31,15 +31,17 @@
         <meta name="twitter:description" content="Kostenlos, ohne Anmeldung. Frage stellen, Link teilen, live abstimmen." />
         <meta name="twitter:image" content="{{ url('/images/og-image.png') }}" />
 
+        @verbatim
         <script type="application/ld+json">
             {
                 "@context": "https://schema.org",
                 "@type": "WebSite",
                 "name": "SimpleVoter",
-                "url": "https://simplevoter.com",
+                "url": "https://www.simplevoter.com",
                 "description": "Kostenlos, ohne Anmeldung. Frage stellen, Link teilen, live abstimmen."
             }
         </script>
+        @endverbatim
 
         @routes
         @vite(['resources/js/app.js'])
