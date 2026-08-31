@@ -24,7 +24,7 @@ const props = defineProps({
         </a>
       </template>
       <template v-else>
-        <span>© {{ year }} <a href="/">SimpleVoter</a> — {{ t('footer.rights') }}</span>
+        <span>© {{ year }} <a href="/">SimpleVoter</a></span>
       </template>
       <nav class="flex items-center gap-4 text-xs">
         <a href="/" class="hover:text-[var(--color-sv-accent)]">{{ t('footer.home') }}</a>
