@@ -31,6 +31,13 @@ const props = defineProps({
         <a href="/datenschutz" class="hover:text-[var(--color-sv-accent)]">{{ t('footer.privacy') }}</a>
         <a href="/impressum" class="hover:text-[var(--color-sv-accent)]">{{ t('footer.imprint') }}</a>
       </nav>
+      <a
+        href="https://www.solvedapps.com"
+        target="_blank"
+        rel="noopener"
+        aria-label="solvedapps"
+        class="opacity-50 transition-opacity hover:opacity-90"
+      ><img src="/images/solvedapps-wordmark.svg" alt="solvedapps" width="65" height="16" /></a>
     </div>
   </footer>
 </template>
