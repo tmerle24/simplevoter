@@ -27,6 +27,9 @@ Route::prefix('/p/{poll}/edit')->name('poll.')->group(function () {
     Route::post('/email', [PollManageController::class, 'sendManageLink'])
         ->middleware('throttle:5,1')
         ->name('email');
+    Route::post('/branding', [PollManageController::class, 'updateBranding'])
+        ->middleware('throttle:20,1')
+        ->name('branding');
     Route::post('/options', [PollOptionController::class, 'store'])->name('options.store');
     Route::patch('/options/{option}', [PollOptionController::class, 'update'])->name('options.update');
     Route::delete('/options/{option}', [PollOptionController::class, 'destroy'])->name('options.destroy');

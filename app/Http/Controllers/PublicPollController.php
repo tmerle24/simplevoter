@@ -78,6 +78,7 @@ class PublicPollController extends Controller
                 'vote_count' => $showCounts ? $option->votes()->count() : null,
             ]),
             'has_voted' => $hasVoted,
+            'branding' => (request()->attributes->get('_event') ?? $poll)->brandingPayload(),
             'latest_question_id' => optional($poll->questions->first())->id,
             'question_count_total' => $poll->questions->count(),
         ];

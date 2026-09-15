@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasBranding;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Event extends Model
 {
+    use HasBranding;
+
     protected $fillable = ['name', 'public_token', 'manage_token', 'active_poll_id'];
 
     protected static function booted(): void

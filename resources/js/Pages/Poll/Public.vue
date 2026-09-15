@@ -4,6 +4,7 @@ import axios from 'axios'
 import { Head } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import { useVoterToken, useAuthorToken } from '@/composables/useDeviceToken'
+import { useBranding } from '@/composables/useBranding'
 import Footer from '@/Components/Footer.vue'
 import LanguageSwitcher from '@/Components/LanguageSwitcher.vue'
 
@@ -19,6 +20,7 @@ const voterToken = useVoterToken(props.publicToken)
 const authorToken = useAuthorToken(props.publicToken)
 
 const state = ref(props.initialState)
+useBranding(() => state.value.branding)
 const selected = ref([]) // array of poll_option_id (auch bei Single-Choice, dann max. 1 Eintrag)
 const submittingVote = ref(false)
 const flashOptionIds = ref(new Set())
@@ -177,7 +179,13 @@ onUnmounted(() => clearInterval(pollTimer))
     </Head>
 
     <header class="flex items-center justify-between px-6 py-3 max-w-2xl w-full mx-auto">
-      <img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="w-44 h-auto" />
+      <img
+        v-if="state.branding?.logo_url"
+        :src="state.branding.logo_url"
+        alt="Logo"
+        class="max-w-44 max-h-12 w-auto h-auto object-contain"
+      />
+      <img v-else src="/images/logo-simplevoter.png" alt="SimpleVoter" class="w-44 h-auto" />
       <div class="flex items-center gap-1">
         <LanguageSwitcher />
 
@@ -263,7 +271,7 @@ onUnmounted(() => clearInterval(pollTimer))
           type="button"
           @click="submitVote"
           :disabled="!selected.length || !state.poll.is_active || submittingVote"
-          class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[var(--color-sv-dark)] text-white font-medium hover:bg-[var(--color-sv-accent)] transition-colors disabled:opacity-40"
+          class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[var(--sv-primary)] text-[var(--sv-on-primary)] font-medium hover:bg-[var(--color-sv-accent)] hover:text-[var(--sv-on-accent)] transition-colors disabled:opacity-40"
         >
           {{ state.has_voted ? t('public.changeVote') : t('public.vote') }}
         </button>
@@ -311,7 +319,7 @@ onUnmounted(() => clearInterval(pollTimer))
             <button
               type="submit"
               :disabled="!questionContent.trim() || submittingQuestion"
-              class="w-full mt-2 py-2 rounded-lg bg-[var(--color-sv-dark)] text-white text-sm hover:bg-[var(--color-sv-accent)] disabled:opacity-40"
+              class="w-full mt-2 py-2 rounded-lg bg-[var(--sv-primary)] text-[var(--sv-on-primary)] text-sm hover:bg-[var(--color-sv-accent)] hover:text-[var(--sv-on-accent)] disabled:opacity-40"
             >
               {{ t('public.send') }}
             </button>

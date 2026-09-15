@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Event;
 use App\Models\Poll;
 use Illuminate\Support\Facades\Schedule;
 
@@ -9,4 +10,7 @@ use Illuminate\Support\Facades\Schedule;
 // automatisch mit.
 Schedule::call(function () {
     Poll::where('last_activity_at', '<', now()->subDays(90))->each->delete();
+
+    // Events ohne Polls aufräumen (inkl. Branding-Logo über deleting-Hook)
+    Event::doesntHave('polls')->where('created_at', '<', now()->subDay())->each->delete();
 })->daily();

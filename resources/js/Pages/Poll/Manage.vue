@@ -6,6 +6,7 @@ import QRCode from 'qrcode'
 import { useI18n } from 'vue-i18n'
 import Footer from '@/Components/Footer.vue'
 import LanguageSwitcher from '@/Components/LanguageSwitcher.vue'
+import { brandingVars, DEFAULT_PRIMARY, DEFAULT_ACCENT } from '@/composables/useBranding'
 
 const props = defineProps({
   poll: { type: Object, required: true },
@@ -83,6 +84,92 @@ const eventNameInput = ref('')
 const savingEventName = ref(false)
 const pollActionTarget = ref(null) // { pid, action: 'detach' | 'delete' }
 const pollActionPending = ref(false)
+
+// Branding-Modal
+const brandingModalOpen = ref(false)
+const savingBranding = ref(false)
+const brandingError = ref('')
+const brandingLogoInput = ref(null)
+const brandingForm = ref({ primary: DEFAULT_PRIMARY, accent: DEFAULT_ACCENT, logoFile: null, logoPreview: null, removeLogo: false })
+const HEX_COLOR = /^#[0-9a-fA-F]{6}$/
+const MAX_LOGO_BYTES = 2 * 1024 * 1024
+
+const hasCustomBranding = computed(() => {
+  const b = poll.value.branding
+  return !!(b?.logo_url || b?.primary_color || b?.accent_color)
+})
+
+const brandingPreviewStyle = computed(() => brandingVars({
+  primary_color: HEX_COLOR.test(brandingForm.value.primary) ? brandingForm.value.primary : null,
+  accent_color: HEX_COLOR.test(brandingForm.value.accent) ? brandingForm.value.accent : null,
+}))
+
+function openBrandingModal() {
+  const b = poll.value.branding ?? {}
+  brandingForm.value = {
+    primary: b.primary_color || DEFAULT_PRIMARY,
+    accent: b.accent_color || DEFAULT_ACCENT,
+    logoFile: null,
+    logoPreview: b.logo_url || null,
+    removeLogo: false,
+  }
+  brandingError.value = ''
+  brandingModalOpen.value = true
+}
+
+function selectBrandingLogo(file) {
+  if (!file) return
+  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+    brandingError.value = t('manage.brandingLogoFormats')
+    return
+  }
+  if (file.size > MAX_LOGO_BYTES) {
+    brandingError.value = t('manage.brandingLogoTooLarge')
+    return
+  }
+  brandingError.value = ''
+  brandingForm.value = { ...brandingForm.value, logoFile: file, logoPreview: URL.createObjectURL(file), removeLogo: false }
+}
+
+function removeBrandingLogo() {
+  brandingForm.value = { ...brandingForm.value, logoFile: null, logoPreview: null, removeLogo: true }
+  if (brandingLogoInput.value) brandingLogoInput.value.value = ''
+}
+
+function resetBrandingForm() {
+  removeBrandingLogo()
+  brandingForm.value = { ...brandingForm.value, primary: DEFAULT_PRIMARY, accent: DEFAULT_ACCENT }
+}
+
+async function saveBranding() {
+  const { primary, accent, logoFile, removeLogo } = brandingForm.value
+  if (!HEX_COLOR.test(primary) || !HEX_COLOR.test(accent)) {
+    brandingError.value = t('manage.brandingInvalidColor')
+    return
+  }
+
+  const form = new FormData()
+  // Default-Farbe → leer, damit spätere Default-Änderungen greifen
+  form.append('primary_color', primary.toLowerCase() === DEFAULT_PRIMARY ? '' : primary)
+  form.append('accent_color', accent.toLowerCase() === DEFAULT_ACCENT ? '' : accent)
+  if (logoFile) form.append('logo', logoFile)
+  if (removeLogo) form.append('remove_logo', '1')
+
+  savingBranding.value = true
+  brandingError.value = ''
+  try {
+    const { data } = await axios.post(`/p/${poll.value.manage_token}/edit/branding`, form)
+    poll.value = data
+    brandingModalOpen.value = false
+  } catch (e) {
+    console.error('Branding konnte nicht gespeichert werden:', e.response?.status, e.response?.data)
+    brandingError.value = e.response?.status === 422
+      ? Object.values(e.response.data.errors ?? {})[0]?.[0] || t('common.error')
+      : t('common.error')
+  } finally {
+    savingBranding.value = false
+  }
+}
 
 const publicUrl = computed(() => `${window.location.origin}/w/${poll.value.public_token}`)
 const manageUrl = computed(() => `${window.location.origin}/p/${poll.value.manage_token}/edit`)
@@ -458,6 +545,33 @@ const exportDate = computed(() =>
 
         <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
           <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-3">
+            {{ t('manage.brandingSection') }}
+          </h2>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-20 h-10 shrink-0 rounded-lg border border-[var(--color-sv-gray-light)] flex items-center justify-center overflow-hidden p-1">
+              <img
+                :src="poll.branding?.logo_url || '/images/logo-simplevoter.png'"
+                alt="Logo"
+                class="max-w-full max-h-full object-contain"
+              />
+            </div>
+            <span class="w-5 h-5 shrink-0 rounded-full ring-1 ring-black/10" :style="{ background: poll.branding?.primary_color || DEFAULT_PRIMARY }" />
+            <span class="w-5 h-5 shrink-0 rounded-full ring-1 ring-black/10" :style="{ background: poll.branding?.accent_color || DEFAULT_ACCENT }" />
+            <span class="text-xs text-[var(--color-sv-gray)] min-w-0">
+              {{ hasCustomBranding ? t('manage.brandingCustom') : t('manage.brandingDefault') }}
+            </span>
+          </div>
+          <button
+            type="button"
+            @click="openBrandingModal"
+            class="w-full text-sm py-2 rounded-lg border border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)] hover:text-[var(--color-sv-accent)] transition-colors"
+          >
+            {{ t('manage.brandingCustomize') }}
+          </button>
+        </section>
+
+        <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
+          <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-3">
             {{ t('manage.manageTitle') }}
           </h2>
           <button type="button" @click="copyLink(manageUrl)" class="w-full text-sm py-2 rounded-lg border border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)]">
@@ -675,7 +789,7 @@ const exportDate = computed(() =>
          beim Drucken sichtbar. Eigenständig statt Bildschirm-Karte, damit der
          Export wie ein richtiges Dokument aussieht statt wie ein UI-Screenshot. -->
     <div id="pdf-report" class="hidden print:block">
-      <img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="h-8 w-auto mb-10" />
+      <img :src="poll.branding?.logo_url || '/images/logo-simplevoter.png'" alt="Logo" class="h-8 w-auto max-w-[12rem] object-contain object-left mb-10" />
 
       <p class="text-xs uppercase tracking-wide text-[#9ea7ae] mb-2">{{ t('manage.pdfExportLabel') }}</p>
       <h1 class="font-display font-semibold text-2xl mb-1 text-[#2b2c30] break-words">{{ poll.question }}</h1>
@@ -691,7 +805,7 @@ const exportDate = computed(() =>
           <div class="h-2.5 rounded-full bg-[#eef0f1] overflow-hidden">
             <div
               class="h-full rounded-full"
-              :style="{ width: `${percent(option)}%`, background: '#bb3245' }"
+              :style="{ width: `${percent(option)}%`, background: poll.branding?.accent_color || '#bb3245' }"
             />
           </div>
         </div>
@@ -819,6 +933,123 @@ const exportDate = computed(() =>
               {{ pollActionTarget?.action === 'delete' ? t('common.delete') : t('manage.detachPoll') }}
             </button>
           </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Modal: Eigenes Design (Logo + Farben) -->
+    <Teleport to="body">
+      <div
+        v-if="brandingModalOpen"
+        class="fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50 sm:px-6"
+        @click.self="brandingModalOpen = false"
+      >
+        <div class="bg-[var(--color-sv-surface)] w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl p-6 max-h-[90vh] overflow-y-auto">
+          <h2 class="font-display font-semibold text-lg mb-1">{{ t('manage.brandingTitle') }}</h2>
+          <p class="text-sm text-[var(--color-sv-gray)] mb-5">{{ t('manage.brandingHint') }}</p>
+
+          <!-- Logo -->
+          <p class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-2">{{ t('manage.brandingLogo') }}</p>
+          <input
+            ref="brandingLogoInput"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            class="hidden"
+            @change="selectBrandingLogo($event.target.files[0])"
+          />
+          <button
+            type="button"
+            @click="brandingLogoInput.click()"
+            @dragover.prevent
+            @drop.prevent="selectBrandingLogo($event.dataTransfer.files[0])"
+            class="w-full h-24 rounded-xl border-2 border-dashed border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-gray)] flex flex-col items-center justify-center gap-1 p-3 transition-colors"
+          >
+            <img v-if="brandingForm.logoPreview" :src="brandingForm.logoPreview" alt="Logo" class="max-h-full max-w-full object-contain" />
+            <template v-else>
+              <span class="text-sm">{{ t('manage.brandingLogoUpload') }}</span>
+              <span class="text-xs text-[var(--color-sv-gray)]">{{ t('manage.brandingLogoFormats') }}</span>
+            </template>
+          </button>
+          <div class="h-6 mt-1 mb-3">
+            <button
+              v-if="brandingForm.logoPreview"
+              type="button"
+              @click="removeBrandingLogo"
+              class="text-xs text-[var(--color-sv-gray)] hover:text-[var(--color-sv-accent)]"
+            >
+              {{ t('manage.brandingLogoRemove') }}
+            </button>
+          </div>
+
+          <!-- Farben -->
+          <div class="grid grid-cols-2 gap-3 mb-5">
+            <div v-for="field in ['primary', 'accent']" :key="field">
+              <p class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)]">
+                {{ field === 'primary' ? t('manage.brandingPrimary') : t('manage.brandingAccent') }}
+              </p>
+              <p class="text-xs text-[var(--color-sv-gray)] mb-2">
+                {{ field === 'primary' ? t('manage.brandingPrimaryHint') : t('manage.brandingAccentHint') }}
+              </p>
+              <div class="flex items-center gap-2 rounded-lg border border-[var(--color-sv-gray-light)] p-1.5 focus-within:ring-2 focus-within:ring-[var(--color-sv-accent)]">
+                <input
+                  type="color"
+                  :value="HEX_COLOR.test(brandingForm[field]) ? brandingForm[field] : '#000000'"
+                  @input="brandingForm[field] = $event.target.value"
+                  class="sv-color-swatch w-8 h-8 shrink-0 rounded-md cursor-pointer"
+                />
+                <input
+                  v-model.trim="brandingForm[field]"
+                  maxlength="7"
+                  spellcheck="false"
+                  class="w-full min-w-0 font-mono-num text-sm uppercase focus:outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Vorschau -->
+          <p class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-2">{{ t('manage.brandingPreview') }}</p>
+          <div :style="brandingPreviewStyle" class="rounded-xl bg-[var(--color-sv-bg)] p-4 mb-5">
+            <img v-if="brandingForm.logoPreview" :src="brandingForm.logoPreview" alt="Logo" class="max-h-8 max-w-32 object-contain mb-3" />
+            <img v-else src="/images/logo-simplevoter.png" alt="SimpleVoter" class="w-28 h-auto mb-3" />
+            <div class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--color-sv-accent)] bg-[var(--color-sv-accent-light)] text-sm mb-2">
+              <span class="w-3 h-3 rounded-full border-[3px] border-[var(--color-sv-accent)] bg-white shrink-0" />
+              <span class="truncate">{{ t('manage.brandingPreviewOption') }}</span>
+              <span class="ml-auto h-1.5 w-16 rounded-full bg-[var(--color-sv-gray-light)] overflow-hidden shrink-0">
+                <span class="block h-full w-2/3 bg-[var(--color-sv-accent)]" />
+              </span>
+            </div>
+            <span class="inline-block px-4 py-1.5 rounded-lg bg-[var(--sv-primary)] text-[var(--sv-on-primary)] text-sm font-medium">
+              {{ t('public.vote') }}
+            </span>
+          </div>
+
+          <p v-if="brandingError" class="text-sm text-[var(--color-sv-accent)] mb-3">{{ brandingError }}</p>
+
+          <div class="flex gap-2">
+            <button
+              type="button"
+              @click="brandingModalOpen = false"
+              class="flex-1 py-2 rounded-lg border border-[var(--color-sv-gray-light)] text-sm hover:border-[var(--color-sv-gray)]"
+            >
+              {{ t('common.cancel') }}
+            </button>
+            <button
+              type="button"
+              @click="saveBranding"
+              :disabled="savingBranding"
+              class="flex-1 py-2 rounded-lg bg-[var(--color-sv-dark)] text-white text-sm hover:bg-[var(--color-sv-accent)] disabled:opacity-40"
+            >
+              {{ t('manage.save') }}
+            </button>
+          </div>
+          <button
+            type="button"
+            @click="resetBrandingForm"
+            class="w-full mt-3 text-xs text-[var(--color-sv-gray)] hover:text-[var(--color-sv-accent)]"
+          >
+            {{ t('manage.brandingReset') }}
+          </button>
         </div>
       </div>
     </Teleport>

@@ -61,6 +61,7 @@ polls
   allows_multiple_choice: boolean
   is_active: boolean
   creator_ip, last_activity_at
+  brand_logo_path, brand_primary_color, brand_accent_color   # auch auf events
   timestamps
 
 poll_options
@@ -113,7 +114,7 @@ POST /w/{public_token}/questions    → QuestionController@store (throttle: 10/m
 GET  /w/{public_token}/questions    → QuestionController@indexForPublic (JSON)
 ```
 
-**Wichtig:** Alle axios-aufgerufenen Endpunkte (PATCH, POST) geben **JSON** zurück, kein `redirect()->back()`. Das verursacht sonst Redirect-Loops bei Inertia/axios.
+**Wichtig:** Alle axios-aufgerufenen Endpunkte (PATCH, POST) geben **JSON** zurück, kein `redirect()->back()`. Das verursacht sonst Redirect-Loops bei Inertia/axios. Validierungsfehler kommen für axios (`expectsJson()`) als 422-JSON, siehe `bootstrap/app.php`.
 
 ---
 
@@ -231,6 +232,17 @@ resources/js/
 
 ### Manage-Token-Sicherheit
 - `manage_token` wird im `PublicPollController` **niemals** ausgeliefert — alle Public-Responses bauen die JSON-Shape manuell statt das Model direkt zu serialisieren
+
+### Eigenes Branding (Logo + 2 Farben)
+- Gespeichert am Link-Besitzer: Event (bzw. Poll ohne Event) → gilt für alle Umfragen eines Events
+- Trait `App\Models\Concerns\HasBranding`: Payload + Logo-Löschung im `deleting`-Hook
+- Logo auf `public`-Disk (`storage/app/public/logos`, braucht `storage:link`), nur PNG/JPG/WebP ≤ 2 MB – **kein SVG** (XSS)
+- Frontend: `composables/useBranding.js` setzt CSS-Variablen auf `<html>` (auch für teleportierte Modals)
+  - `--sv-primary` / `--sv-on-primary`: Buttons (Text hell/dunkel automatisch per Luminanz)
+  - `--color-sv-accent` / `--color-sv-accent-light` / `--sv-on-accent`: Auswahl, Balken, Hinweise
+  - `--color-sv-dark` wird bewusst **nicht** überschrieben (sonst würde eine helle Hauptfarbe den Fließtext unlesbar machen)
+- Branding wird im `/state`-Polling mitgeliefert → Änderungen erscheinen live bei Teilnehmern
+- PDF-Export nutzt Brand-Logo und Akzentfarbe
 
 ### E-Mail (Verwaltungs-Link)
 - `ManageLinkMail` (Laravel Mailable, Markdown-Template)

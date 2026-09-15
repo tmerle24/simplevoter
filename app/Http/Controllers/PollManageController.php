@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ManageLinkMail;
+use App\Models\Event;
 use App\Models\Poll;
 use App\Models\Vote;
 use Illuminate\Http\Request;
@@ -69,6 +70,33 @@ class PollManageController extends Controller
         }
 
         return response()->json(['ok' => true]);
+    }
+
+    public function updateBranding(Request $request, Poll $poll)
+    {
+        $validated = $request->validate([
+            // kein SVG: würde direkt aufgerufen Scripts auf unserer Domain ausführen
+            'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048', 'dimensions:max_width=4000,max_height=4000'],
+            'remove_logo' => ['sometimes', 'boolean'],
+            'primary_color' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'accent_color' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
+        ]);
+
+        $owner = $this->brandOwner($poll);
+        $logoPath = $owner->brand_logo_path;
+
+        if ($request->hasFile('logo') || $request->boolean('remove_logo')) {
+            $owner->deleteBrandLogo();
+            $logoPath = $request->hasFile('logo') ? $request->file('logo')->store('logos', 'public') : null;
+        }
+
+        $owner->update([
+            'brand_logo_path' => $logoPath,
+            'brand_primary_color' => isset($validated['primary_color']) ? strtolower($validated['primary_color']) : null,
+            'brand_accent_color' => isset($validated['accent_color']) ? strtolower($validated['accent_color']) : null,
+        ]);
+
+        return response()->json($this->ownerPayload($poll));
     }
 
     public function addPoll(Request $request, Poll $poll)
@@ -195,6 +223,11 @@ class PollManageController extends Controller
         return response()->json($this->ownerPayload($poll));
     }
 
+    private function brandOwner(Poll $poll): Event|Poll
+    {
+        return request()->attributes->get('_event') ?? $poll;
+    }
+
     private function ownerPayload(Poll $poll): array
     {
         $event = request()->attributes->get('_event');
@@ -229,6 +262,7 @@ class PollManageController extends Controller
                 'author_name' => $question->author_name,
                 'created_at' => $question->created_at,
             ]),
+            'branding' => ($event ?? $poll)->brandingPayload(),
             'event' => $event ? [
                 'id' => $event->id,
                 'name' => $event->name,
