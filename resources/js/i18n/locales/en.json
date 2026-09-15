@@ -19,7 +19,11 @@
       "qaText": "The speech-bubble icon lets participants leave comments that appear right away.",
       "shareTitle": "Share anywhere",
       "shareText": "One link or QR code is all it takes. Works in five languages, on any device."
-    }
+    },
+    "myPolls": "Your polls",
+    "myPollsHint": "Only saved on this device – also send yourself the management link by email.",
+    "myPollsUntitled": "Poll",
+    "myPollsRemove": "Remove from list"
   },
   "footer": {
     "home": "Home",

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
 import axios from 'axios'
 import { Head } from '@inertiajs/vue3'
 import QRCode from 'qrcode'
@@ -7,6 +7,7 @@ import { useI18n } from 'vue-i18n'
 import Footer from '@/Components/Footer.vue'
 import LanguageSwitcher from '@/Components/LanguageSwitcher.vue'
 import { brandingVars, DEFAULT_PRIMARY, DEFAULT_ACCENT } from '@/composables/useBranding'
+import { rememberPoll, updatePollTitle, forgetPoll } from '@/composables/useMyPolls'
 
 const props = defineProps({
   poll: { type: Object, required: true },
@@ -174,7 +175,11 @@ async function saveBranding() {
 const publicUrl = computed(() => `${window.location.origin}/w/${poll.value.public_token}`)
 const manageUrl = computed(() => `${window.location.origin}/p/${poll.value.manage_token}/edit`)
 
-localStorage.setItem('sv_last_manage_token', poll.value.manage_token)
+// Titel für "Deine Umfragen" auf der Startseite
+const listTitle = computed(() => poll.value.event?.name || poll.value.question)
+
+rememberPoll({ manage_token: poll.value.manage_token, public_token: poll.value.public_token, title: listTitle.value })
+watch(listTitle, (title) => updatePollTitle(poll.value.manage_token, title))
 
 async function refresh() {
   try {
@@ -353,6 +358,7 @@ async function confirmPollAction() {
       ? await axios.delete(`/p/${poll.value.manage_token}/edit/polls/${pid}`)
       : await axios.post(`/p/${poll.value.manage_token}/edit/polls/${pid}/detach`)
     if (data.redirect) {
+      forgetPoll(poll.value.manage_token)
       window.location.href = data.redirect
       return
     }

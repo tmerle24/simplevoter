@@ -19,7 +19,11 @@
       "qaText": "Via het spraakbelletje-icoon kunnen deelnemers reacties achterlaten die direct zichtbaar worden.",
       "shareTitle": "Overal deelbaar",
       "shareText": "Eén link of QR-code is genoeg. Werkt in vijf talen, op elk apparaat."
-    }
+    },
+    "myPolls": "Jouw peilingen",
+    "myPollsHint": "Alleen op dit apparaat opgeslagen – stuur jezelf ook de beheerlink per e-mail.",
+    "myPollsUntitled": "Peiling",
+    "myPollsRemove": "Uit de lijst verwijderen"
   },
   "footer": {
     "home": "Home",

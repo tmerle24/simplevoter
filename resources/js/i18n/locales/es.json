@@ -19,7 +19,11 @@
       "qaText": "El icono de bocadillo permite a los participantes dejar comentarios que aparecen al instante.",
       "shareTitle": "Compartible en cualquier lugar",
       "shareText": "Basta un enlace o un código QR. Funciona en cinco idiomas, en cualquier dispositivo."
-    }
+    },
+    "myPolls": "Tus encuestas",
+    "myPollsHint": "Solo se guardan en este dispositivo: envíate también el enlace de gestión por correo.",
+    "myPollsUntitled": "Encuesta",
+    "myPollsRemove": "Quitar de la lista"
   },
   "footer": {
     "home": "Inicio",

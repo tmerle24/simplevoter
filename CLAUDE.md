@@ -130,6 +130,8 @@ resources/js/
       de.json, en.json, fr.json, es.json, nl.json
   composables/
     useDeviceToken.js             # voter_token + author_token client-seitig generieren/lesen
+    useBranding.js                # Branding-Farben als CSS-Variablen
+    useMyPolls.js                 # "Deine Umfragen" auf der Startseite (LocalStorage, max. 12)
   Components/
     Footer.vue                    # Props: powered-by (Boolean) – Public-Seite nutzt powered-by=true
     LanguageSwitcher.vue          # Flaggen-Dropdown, kein nativer <select>
