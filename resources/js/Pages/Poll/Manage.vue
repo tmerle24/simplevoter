@@ -512,10 +512,16 @@ const exportDate = computed(() =>
           </div>
         </section>
 
-        <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
-          <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-4">
-            {{ t('manage.questionsFromParticipants') }}
-          </h2>
+        <!-- Bei abgeschalteten Kommentaren nur einblenden, solange noch welche da sind -->
+        <CollapsibleCard
+          v-if="poll.questions_enabled || poll.questions.length"
+          id="participant-questions"
+          :title="t('manage.questionsFromParticipants')"
+          header-class="mb-4"
+        >
+          <template v-if="!poll.questions_enabled" #actions>
+            <span class="text-xs text-[var(--color-sv-gray)]">{{ t('manage.questionsDisabled') }}</span>
+          </template>
           <p v-if="!poll.questions.length" class="text-sm text-[var(--color-sv-gray)]">
             {{ t('manage.noQuestionsYet') }}
           </p>
@@ -525,7 +531,7 @@ const exportDate = computed(() =>
               <p v-if="q.author_name" class="text-xs text-[var(--color-sv-gray)] mt-1">— {{ q.author_name }}</p>
             </li>
           </ul>
-        </section>
+        </CollapsibleCard>
       </div>
 
       <!-- Rechte Spalte: Teilen, Verwalten, Einstellungen -->

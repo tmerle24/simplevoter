@@ -112,7 +112,8 @@
     "brandingPreview": "Preview",
     "brandingPreviewOption": "Sample answer",
     "brandingReset": "Restore default",
-    "brandingInvalidColor": "Please enter colors in #RRGGBB format."
+    "brandingInvalidColor": "Please enter colors in #RRGGBB format.",
+    "questionsDisabled": "disabled"
   },
   "public": {
     "vote": "Vote",

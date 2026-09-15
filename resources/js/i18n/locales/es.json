@@ -112,7 +112,8 @@
     "brandingPreview": "Vista previa",
     "brandingPreviewOption": "Respuesta de ejemplo",
     "brandingReset": "Restablecer estándar",
-    "brandingInvalidColor": "Introduce los colores en formato #RRGGBB."
+    "brandingInvalidColor": "Introduce los colores en formato #RRGGBB.",
+    "questionsDisabled": "desactivados"
   },
   "public": {
     "vote": "Votar",

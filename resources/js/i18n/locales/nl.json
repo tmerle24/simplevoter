@@ -112,7 +112,8 @@
     "brandingPreview": "Voorbeeld",
     "brandingPreviewOption": "Voorbeeldantwoord",
     "brandingReset": "Standaard herstellen",
-    "brandingInvalidColor": "Vul kleuren in als #RRGGBB."
+    "brandingInvalidColor": "Vul kleuren in als #RRGGBB.",
+    "questionsDisabled": "uitgeschakeld"
   },
   "public": {
     "vote": "Stemmen",

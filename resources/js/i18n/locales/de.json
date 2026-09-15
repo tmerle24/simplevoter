@@ -112,7 +112,8 @@
     "brandingPreview": "Vorschau",
     "brandingPreviewOption": "Beispiel-Antwort",
     "brandingReset": "Standard wiederherstellen",
-    "brandingInvalidColor": "Bitte Farben im Format #RRGGBB angeben."
+    "brandingInvalidColor": "Bitte Farben im Format #RRGGBB angeben.",
+    "questionsDisabled": "deaktiviert"
   },
   "public": {
     "vote": "Abstimmen",
