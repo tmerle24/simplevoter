@@ -21,7 +21,8 @@
       "shareText": "Un lien ou un QR code suffit. Fonctionne en cinq langues, sur tous les appareils."
     },
     "myPolls": "Vos sondages",
-    "myPollsUntitled": "Sondage"
+    "myPollsUntitled": "Sondage",
+    "myPollsHint": "Enregistrés uniquement sur cet appareil."
   },
   "footer": {
     "home": "Accueil",

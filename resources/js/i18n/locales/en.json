@@ -21,7 +21,8 @@
       "shareText": "One link or QR code is all it takes. Works in five languages, on any device."
     },
     "myPolls": "Your polls",
-    "myPollsUntitled": "Poll"
+    "myPollsUntitled": "Poll",
+    "myPollsHint": "Only saved on this device."
   },
   "footer": {
     "home": "Home",

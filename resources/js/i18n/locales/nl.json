@@ -21,7 +21,8 @@
       "shareText": "Eén link of QR-code is genoeg. Werkt in vijf talen, op elk apparaat."
     },
     "myPolls": "Jouw peilingen",
-    "myPollsUntitled": "Peiling"
+    "myPollsUntitled": "Peiling",
+    "myPollsHint": "Alleen op dit apparaat opgeslagen."
   },
   "footer": {
     "home": "Home",

@@ -205,6 +205,7 @@ async function submit() {
               </a>
             </li>
           </ul>
+          <p class="mt-3 text-xs text-[var(--color-sv-gray)]">{{ t('landing.myPollsHint') }}</p>
         </section>
       </div>
     </main>
