@@ -11,7 +11,7 @@ const props = defineProps({
 
 <template>
   <footer class="border-t border-[var(--color-sv-gray-light)] mt-16">
-    <div class="max-w-2xl mx-auto px-6 pt-6 pb-10 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-[var(--color-sv-gray)]">
+    <div class="max-w-2xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-[var(--color-sv-gray)]">
       <template v-if="poweredBy">
         <a
           href="https://simplevoter.com"
@@ -20,7 +20,7 @@ const props = defineProps({
           class="flex items-center gap-2 group"
         >
           <span class="text-xs">Powered by</span>
-          <img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="w-24 h-auto opacity-50 group-hover:opacity-90 transition-opacity" />
+          <img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="block w-24 h-auto opacity-50 group-hover:opacity-90 transition-opacity" />
         </a>
       </template>
       <template v-else>
@@ -36,8 +36,11 @@ const props = defineProps({
         target="_blank"
         rel="noopener"
         aria-label="solvedapps"
-        class="opacity-50 transition-opacity hover:opacity-90"
-      ><img src="/images/solvedapps-wordmark.svg" alt="solvedapps" width="130" height="32" /></a>
+        class="block opacity-50 transition-opacity hover:opacity-90"
+      >
+        <!-- x-height sitzt unterhalb der Bildmitte → optisch ausgleichen -->
+        <img src="/images/solvedapps-wordmark.svg" alt="solvedapps" width="130" height="32" class="block -translate-y-0.5" />
+      </a>
     </div>
   </footer>
 </template>
