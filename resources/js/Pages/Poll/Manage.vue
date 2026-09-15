@@ -6,6 +6,7 @@ import QRCode from 'qrcode'
 import { useI18n } from 'vue-i18n'
 import Footer from '@/Components/Footer.vue'
 import LanguageSwitcher from '@/Components/LanguageSwitcher.vue'
+import CollapsibleCard from '@/Components/CollapsibleCard.vue'
 import { brandingVars, DEFAULT_PRIMARY, DEFAULT_ACCENT } from '@/composables/useBranding'
 import { rememberPoll, updatePollTitle, forgetPoll } from '@/composables/useMyPolls'
 
@@ -549,10 +550,7 @@ const exportDate = computed(() =>
           </button>
         </section>
 
-        <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
-          <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-3">
-            {{ t('manage.manageTitle') }}
-          </h2>
+        <CollapsibleCard id="manage" :title="t('manage.manageTitle')">
           <button type="button" @click="copyLink(manageUrl)" class="w-full text-sm py-2 rounded-lg border border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)]">
             {{ copyState === 'copied' ? t('manage.copied') : t('manage.copyLink') }}
           </button>
@@ -585,39 +583,9 @@ const exportDate = computed(() =>
           <p v-if="manageLinkEmailStatus === 'error'" class="text-xs text-[var(--color-sv-accent)] mt-2">
             {{ t('common.error') }}
           </p>
-        </section>
+        </CollapsibleCard>
 
-        <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
-          <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-3">
-            {{ t('manage.brandingSection') }}
-          </h2>
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-20 h-10 shrink-0 rounded-lg border border-[var(--color-sv-gray-light)] flex items-center justify-center overflow-hidden p-1">
-              <img
-                :src="poll.branding?.logo_url || '/images/logo-simplevoter.png'"
-                alt="Logo"
-                class="max-w-full max-h-full object-contain"
-              />
-            </div>
-            <span class="w-5 h-5 shrink-0 rounded-full ring-1 ring-black/10" :style="{ background: poll.branding?.primary_color || DEFAULT_PRIMARY }" />
-            <span class="w-5 h-5 shrink-0 rounded-full ring-1 ring-black/10" :style="{ background: poll.branding?.accent_color || DEFAULT_ACCENT }" />
-            <span class="text-xs text-[var(--color-sv-gray)] min-w-0">
-              {{ hasCustomBranding ? t('manage.brandingCustom') : t('manage.brandingDefault') }}
-            </span>
-          </div>
-          <button
-            type="button"
-            @click="openBrandingModal"
-            class="w-full text-sm py-2 rounded-lg border border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)] hover:text-[var(--color-sv-accent)] transition-colors"
-          >
-            {{ t('manage.brandingCustomize') }}
-          </button>
-        </section>
-
-        <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
-          <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-3">
-            {{ t('manage.votingSection') }}
-          </h2>
+        <CollapsibleCard id="voting" :title="t('manage.votingSection')">
           <label class="flex items-center gap-2 text-sm mb-2 cursor-pointer">
             <input type="radio" name="voting_mode" :checked="!poll.allows_multiple_choice" @change="saveSettings({ allows_multiple_choice: false })" />
             {{ t('manage.singleChoice') }}
@@ -626,13 +594,10 @@ const exportDate = computed(() =>
             <input type="radio" name="voting_mode" :checked="poll.allows_multiple_choice" @change="saveSettings({ allows_multiple_choice: true })" />
             {{ t('manage.multipleChoice') }}
           </label>
-        </section>
+        </CollapsibleCard>
 
-        <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)]">
-              {{ t('manage.questionsSection') }}
-            </h2>
+        <CollapsibleCard id="questions" :title="t('manage.questionsSection')">
+          <template #actions>
             <button
               type="button"
               role="switch"
@@ -646,7 +611,7 @@ const exportDate = computed(() =>
                 :style="{ left: poll.questions_enabled ? '18px' : '2px' }"
               />
             </button>
-          </div>
+          </template>
 
           <div :class="{ 'opacity-40 pointer-events-none': !poll.questions_enabled }">
             <label class="flex items-center gap-2 text-sm mb-2 cursor-pointer">
@@ -662,14 +627,11 @@ const exportDate = computed(() =>
               {{ t('manage.nameRequired') }}
             </label>
           </div>
-        </section>
+        </CollapsibleCard>
 
         <!-- Umfragen-Box: nur sichtbar wenn Poll zu einem Event gehört -->
-        <section v-if="poll.event" class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
-          <div class="flex items-center justify-between mb-1">
-            <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)]">
-              {{ t('manage.pollsSection') }}
-            </h2>
+        <CollapsibleCard v-if="poll.event" id="polls" :title="t('manage.pollsSection')" header-class="mb-1">
+          <template #actions>
             <button
               v-if="poll.event.polls.length >= 2"
               type="button"
@@ -678,7 +640,7 @@ const exportDate = computed(() =>
             >
               {{ t('manage.editEventName') }}
             </button>
-          </div>
+          </template>
           <p
             v-if="poll.event.name"
             class="text-sm font-medium text-[var(--color-sv-dark)] mb-3 mt-3"
@@ -741,12 +703,33 @@ const exportDate = computed(() =>
           >
             + {{ t('manage.addPoll') }}
           </button>
-        </section>
+        </CollapsibleCard>
 
-        <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
-          <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-3">
-            {{ t('manage.controlSection') }}
-          </h2>
+        <CollapsibleCard id="branding" :title="t('manage.brandingSection')">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-20 h-10 shrink-0 rounded-lg border border-[var(--color-sv-gray-light)] flex items-center justify-center overflow-hidden p-1">
+              <img
+                :src="poll.branding?.logo_url || '/images/logo-simplevoter.png'"
+                alt="Logo"
+                class="max-w-full max-h-full object-contain"
+              />
+            </div>
+            <span class="w-5 h-5 shrink-0 rounded-full ring-1 ring-black/10" :style="{ background: poll.branding?.primary_color || DEFAULT_PRIMARY }" />
+            <span class="w-5 h-5 shrink-0 rounded-full ring-1 ring-black/10" :style="{ background: poll.branding?.accent_color || DEFAULT_ACCENT }" />
+            <span class="text-xs text-[var(--color-sv-gray)] min-w-0">
+              {{ hasCustomBranding ? t('manage.brandingCustom') : t('manage.brandingDefault') }}
+            </span>
+          </div>
+          <button
+            type="button"
+            @click="openBrandingModal"
+            class="w-full text-sm py-2 rounded-lg border border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)] hover:text-[var(--color-sv-accent)] transition-colors"
+          >
+            {{ t('manage.brandingCustomize') }}
+          </button>
+        </CollapsibleCard>
+
+        <CollapsibleCard id="control" :title="t('manage.controlSection')">
 
           <button
             type="button"
@@ -787,7 +770,7 @@ const exportDate = computed(() =>
           >
             {{ t('manage.deletePoll') }}
           </button>
-        </section>
+        </CollapsibleCard>
       </div>
     </main>
 

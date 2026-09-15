@@ -46,7 +46,7 @@
     "manageTitle": "Manage",
     "manageLink": "Manage link",
     "open": "Open",
-    "manageLinkWarning": "Don't share this link publicly — it grants full access to the poll.",
+    "manageLinkWarning": "Your personal link for managing the poll.",
     "pdfExportLabel": "Results export",
     "pdfTotalVotes": "votes total",
     "pdfExportedOn": "Exported on",

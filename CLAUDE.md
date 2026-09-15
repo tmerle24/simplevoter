@@ -134,6 +134,7 @@ resources/js/
     useMyPolls.js                 # "Deine Umfragen" auf der Startseite (LocalStorage, max. 12)
   Components/
     Footer.vue                    # Props: powered-by (Boolean) – Public-Seite nutzt powered-by=true
+    CollapsibleCard.vue           # Einklappbare Karte (Titel-Klick), Zustand geräteweit in localStorage('sv_collapsed_cards')
     LanguageSwitcher.vue          # Flaggen-Dropdown, kein nativer <select>
   Pages/
     Landing.vue                   # Zero-Friction-Erstellung

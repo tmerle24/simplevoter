@@ -46,7 +46,7 @@
     "manageTitle": "Gestionar",
     "manageLink": "Enlace de gestión",
     "open": "Abrir",
-    "manageLinkWarning": "No compartas este enlace públicamente — otorga acceso completo a la encuesta.",
+    "manageLinkWarning": "Tu enlace personal para gestionar la encuesta.",
     "pdfExportLabel": "Exportación de resultados",
     "pdfTotalVotes": "votos en total",
     "pdfExportedOn": "Exportado el",

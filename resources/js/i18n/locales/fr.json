@@ -46,7 +46,7 @@
     "manageTitle": "Gérer",
     "manageLink": "Lien de gestion",
     "open": "Ouvrir",
-    "manageLinkWarning": "Ne partage pas ce lien publiquement — il donne un accès complet au sondage.",
+    "manageLinkWarning": "Ton lien personnel pour gérer le sondage.",
     "pdfExportLabel": "Export des résultats",
     "pdfTotalVotes": "votes au total",
     "pdfExportedOn": "Exporté le",
