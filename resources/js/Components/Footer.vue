@@ -24,7 +24,7 @@ const props = defineProps({
         </a>
       </template>
       <template v-else>
-        <span>© {{ year }} <a href="/">SimpleVoter</a></span>
+        <span class="text-xs">© {{ year }} <a href="/">SimpleVoter</a></span>
       </template>
       <nav class="flex items-center gap-4 text-xs">
         <a href="/" class="hover:text-[var(--color-sv-accent)]">{{ t('footer.home') }}</a>
@@ -39,7 +39,7 @@ const props = defineProps({
         class="block opacity-50 transition-opacity hover:opacity-90"
       >
         <!-- x-height sitzt unterhalb der Bildmitte → optisch ausgleichen -->
-        <img src="/images/solvedapps-wordmark.svg" alt="solvedapps" width="130" height="32" class="block -translate-y-0.5" />
+        <img src="/images/solvedapps-wordmark.svg" alt="solvedapps" width="130" height="32" class="block -translate-y-[3px]" />
       </a>
     </div>
   </footer>

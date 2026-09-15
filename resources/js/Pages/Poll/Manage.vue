@@ -409,7 +409,7 @@ const exportDate = computed(() =>
     </Head>
 
     <header class="flex items-center justify-between px-6 py-3 max-w-4xl w-full mx-auto">
-      <img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="w-44 h-auto" />
+      <a href="/" class="block"><img src="/images/logo-simplevoter.png" alt="SimpleVoter" class="block w-44 h-auto" /></a>
       <LanguageSwitcher />
     </header>
 
