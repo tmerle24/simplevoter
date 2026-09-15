@@ -191,6 +191,11 @@ async function submit() {
           <ul class="divide-y divide-[var(--color-sv-gray-light)] border-y border-[var(--color-sv-gray-light)]">
             <li v-for="entry in myPolls" :key="entry.manage_token">
               <a :href="`/p/${entry.manage_token}/edit`" class="group flex items-center gap-3 py-3">
+                <svg viewBox="0 0 16 16" class="block shrink-0 w-4 h-4 text-[var(--color-sv-gray)] transition-colors group-hover:text-[var(--color-sv-accent)]" fill="currentColor" aria-hidden="true">
+                  <rect x="2" y="8.5" width="3" height="5.5" rx="0.75" opacity="0.5" />
+                  <rect x="6.5" y="5" width="3" height="9" rx="0.75" opacity="0.75" />
+                  <rect x="11" y="2" width="3" height="12" rx="0.75" />
+                </svg>
                 <span class="flex-1 min-w-0 truncate text-sm transition-colors group-hover:text-[var(--color-sv-accent)]">
                   {{ entry.title || t('landing.myPollsUntitled') }}
                 </span>
