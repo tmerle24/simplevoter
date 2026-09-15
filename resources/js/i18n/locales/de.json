@@ -21,9 +21,7 @@
       "shareText": "Ein Link oder QR-Code genügt. Funktioniert in fünf Sprachen, unabhängig vom Gerät."
     },
     "myPolls": "Deine Umfragen",
-    "myPollsHint": "Nur auf diesem Gerät gespeichert – sichere dir den Verwaltungs-Link zusätzlich per E-Mail.",
-    "myPollsUntitled": "Umfrage",
-    "myPollsRemove": "Aus der Liste entfernen"
+    "myPollsUntitled": "Umfrage"
   },
   "footer": {
     "home": "Startseite",

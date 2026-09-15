@@ -5,9 +5,9 @@ import axios from 'axios'
 import { useI18n } from 'vue-i18n'
 import Footer from '@/Components/Footer.vue'
 import LanguageSwitcher from '@/Components/LanguageSwitcher.vue'
-import { readMyPolls, forgetPoll } from '@/composables/useMyPolls'
+import { readMyPolls } from '@/composables/useMyPolls'
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 
 const question = ref('')
 const options = ref(['', ''])
@@ -15,16 +15,7 @@ const website = ref('') // Honeypot – bleibt für Menschen unsichtbar (Abschni
 const submitting = ref(false)
 const error = ref('')
 
-const myPolls = ref(readMyPolls())
-
-function removeFromMyPolls(manageToken) {
-  forgetPoll(manageToken)
-  myPolls.value = readMyPolls()
-}
-
-function formatDate(iso) {
-  return iso ? new Date(iso).toLocaleDateString(locale.value, { dateStyle: 'medium' }) : ''
-}
+const myPolls = readMyPolls()
 
 const features = [
   {
@@ -194,30 +185,19 @@ async function submit() {
         </form>
 
         <section v-if="myPolls.length" class="mt-12">
-          <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)]">
+          <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-3">
             {{ t('landing.myPolls') }}
           </h2>
-          <p class="text-xs text-[var(--color-sv-gray)] mt-1 mb-3">{{ t('landing.myPollsHint') }}</p>
-          <ul class="space-y-2">
-            <li
-              v-for="entry in myPolls"
-              :key="entry.manage_token"
-              class="group flex items-center rounded-xl border border-[var(--color-sv-gray-light)] bg-[var(--color-sv-surface)] hover:border-[var(--color-sv-accent)] transition-colors"
-            >
-              <a :href="`/p/${entry.manage_token}/edit`" class="flex-1 min-w-0 flex items-center gap-3 px-4 py-3">
-                <span class="flex-1 min-w-0 truncate text-sm">{{ entry.title || t('landing.myPollsUntitled') }}</span>
-                <span v-if="entry.updated_at" class="shrink-0 text-xs text-[var(--color-sv-gray)]">{{ formatDate(entry.updated_at) }}</span>
-                <span aria-hidden="true" class="shrink-0 text-[var(--color-sv-gray)] group-hover:text-[var(--color-sv-accent)]">→</span>
+          <ul class="divide-y divide-[var(--color-sv-gray-light)] border-y border-[var(--color-sv-gray-light)]">
+            <li v-for="entry in myPolls" :key="entry.manage_token">
+              <a :href="`/p/${entry.manage_token}/edit`" class="group flex items-center gap-3 py-3">
+                <span class="flex-1 min-w-0 truncate text-sm transition-colors group-hover:text-[var(--color-sv-accent)]">
+                  {{ entry.title || t('landing.myPollsUntitled') }}
+                </span>
+                <svg viewBox="0 0 16 16" class="block shrink-0 w-4 h-4 text-[var(--color-sv-gray)] transition group-hover:text-[var(--color-sv-accent)] group-hover:translate-x-0.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M6 3.5 10.5 8 6 12.5" />
+                </svg>
               </a>
-              <button
-                type="button"
-                @click="removeFromMyPolls(entry.manage_token)"
-                class="shrink-0 w-9 h-9 mr-1.5 flex items-center justify-center rounded-lg text-[var(--color-sv-gray)] hover:text-[var(--color-sv-accent)]"
-                :title="t('landing.myPollsRemove')"
-                :aria-label="t('landing.myPollsRemove')"
-              >
-                ✕
-              </button>
             </li>
           </ul>
         </section>
