@@ -545,33 +545,6 @@ const exportDate = computed(() =>
 
         <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
           <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-3">
-            {{ t('manage.brandingSection') }}
-          </h2>
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-20 h-10 shrink-0 rounded-lg border border-[var(--color-sv-gray-light)] flex items-center justify-center overflow-hidden p-1">
-              <img
-                :src="poll.branding?.logo_url || '/images/logo-simplevoter.png'"
-                alt="Logo"
-                class="max-w-full max-h-full object-contain"
-              />
-            </div>
-            <span class="w-5 h-5 shrink-0 rounded-full ring-1 ring-black/10" :style="{ background: poll.branding?.primary_color || DEFAULT_PRIMARY }" />
-            <span class="w-5 h-5 shrink-0 rounded-full ring-1 ring-black/10" :style="{ background: poll.branding?.accent_color || DEFAULT_ACCENT }" />
-            <span class="text-xs text-[var(--color-sv-gray)] min-w-0">
-              {{ hasCustomBranding ? t('manage.brandingCustom') : t('manage.brandingDefault') }}
-            </span>
-          </div>
-          <button
-            type="button"
-            @click="openBrandingModal"
-            class="w-full text-sm py-2 rounded-lg border border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)] hover:text-[var(--color-sv-accent)] transition-colors"
-          >
-            {{ t('manage.brandingCustomize') }}
-          </button>
-        </section>
-
-        <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
-          <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-3">
             {{ t('manage.manageTitle') }}
           </h2>
           <button type="button" @click="copyLink(manageUrl)" class="w-full text-sm py-2 rounded-lg border border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)]">
@@ -606,6 +579,33 @@ const exportDate = computed(() =>
           <p v-if="manageLinkEmailStatus === 'error'" class="text-xs text-[var(--color-sv-accent)] mt-2">
             {{ t('common.error') }}
           </p>
+        </section>
+
+        <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
+          <h2 class="text-xs font-medium uppercase tracking-wide text-[var(--color-sv-gray)] mb-3">
+            {{ t('manage.brandingSection') }}
+          </h2>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-20 h-10 shrink-0 rounded-lg border border-[var(--color-sv-gray-light)] flex items-center justify-center overflow-hidden p-1">
+              <img
+                :src="poll.branding?.logo_url || '/images/logo-simplevoter.png'"
+                alt="Logo"
+                class="max-w-full max-h-full object-contain"
+              />
+            </div>
+            <span class="w-5 h-5 shrink-0 rounded-full ring-1 ring-black/10" :style="{ background: poll.branding?.primary_color || DEFAULT_PRIMARY }" />
+            <span class="w-5 h-5 shrink-0 rounded-full ring-1 ring-black/10" :style="{ background: poll.branding?.accent_color || DEFAULT_ACCENT }" />
+            <span class="text-xs text-[var(--color-sv-gray)] min-w-0">
+              {{ hasCustomBranding ? t('manage.brandingCustom') : t('manage.brandingDefault') }}
+            </span>
+          </div>
+          <button
+            type="button"
+            @click="openBrandingModal"
+            class="w-full text-sm py-2 rounded-lg border border-[var(--color-sv-gray-light)] hover:border-[var(--color-sv-accent)] hover:text-[var(--color-sv-accent)] transition-colors"
+          >
+            {{ t('manage.brandingCustomize') }}
+          </button>
         </section>
 
         <section class="bg-[var(--color-sv-surface)] border border-[var(--color-sv-gray-light)] rounded-2xl p-6">
